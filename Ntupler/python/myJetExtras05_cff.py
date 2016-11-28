@@ -90,6 +90,10 @@ AK5jetSecondaryVertexTagInfosSJ.trackIPTagInfos  = "AK5jetImpactParameterTagInfo
 AK5jetCombinedSecondaryVertexBJetTagsSJ          = combinedSecondaryVertexBJetTags.clone()
 AK5jetCombinedSecondaryVertexBJetTagsSJ.tagInfos = cms.VInputTag( cms.InputTag("AK5jetImpactParameterTagInfosSJ"), cms.InputTag("AK5jetSecondaryVertexTagInfosSJ") )
 
+# MVA tag
+AK5jetCombinedSecondaryVertexMVABJetTags          = combinedSecondaryVertexMVABJetTags.clone()
+AK5jetCombinedSecondaryVertexMVABJetTags.tagInfos = cms.VInputTag(cms.InputTag("AK5jetImpactParameterTagInfos"), cms.InputTag("AK5jetSecondaryVertexTagInfos"))
+
 from JetTools.AnalyzerToolbox.QGTagger_RecoJets_cff import *
 AK5QGTagger                = QGTagger.clone()
 AK5QGTagger.srcJets        = cms.InputTag('AK5PFJets')
@@ -130,6 +134,7 @@ AK5jetsequence = cms.Sequence(
     AK5jetSecondaryVertexTagInfosSJ   *
     AK5jetCombinedSecondaryVertexBJetTags * 
     AK5jetCombinedSecondaryVertexBJetTagsSJ  *
+    AK5jetCombinedSecondaryVertexMVABJetTags * 
     AK5QGTagger                       *
     AK5QGTaggerSubJets                *                
     AK5Njettiness                     

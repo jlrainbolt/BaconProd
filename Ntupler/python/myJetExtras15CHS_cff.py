@@ -68,6 +68,10 @@ CA15jetSecondaryVertexTagInfosSJCHS.trackIPTagInfos  = "CA15jetImpactParameterTa
 CA15jetCombinedSecondaryVertexBJetTagsSJCHS          = combinedSecondaryVertexBJetTags.clone()
 CA15jetCombinedSecondaryVertexBJetTagsSJCHS.tagInfos = cms.VInputTag( cms.InputTag("CA15jetImpactParameterTagInfosSJCHS"), cms.InputTag("CA15jetSecondaryVertexTagInfosSJCHS") )
 
+# MVA tag
+CA15jetCombinedSecondaryVertexMVABJetTags          = combinedSecondaryVertexMVABJetTags.clone()
+CA15jetCombinedSecondaryVertexMVABJetTags.tagInfos = cms.VInputTag( cms.InputTag("CA15jetImpactParameterTagInfosCHS"), cms.InputTag("CA15jetSecondaryVertexTagInfosCHS") )
+
 from JetTools.AnalyzerToolbox.QGTagger_RecoJets_cff import *
 CA15QGTaggerCHS                = QGTagger.clone()
 CA15QGTaggerCHS.srcJets        = cms.InputTag('CA15PFJetsCHS')
@@ -94,6 +98,7 @@ CA15jetsequenceCHS = cms.Sequence(
     CA15jetSecondaryVertexTagInfosSJCHS   *
     CA15jetCombinedSecondaryVertexBJetTagsCHS * 
     CA15jetCombinedSecondaryVertexBJetTagsSJCHS  *
+    CA15jetCombinedSecondaryVertexMVABJetTags *
     CA15QGTaggerCHS                       *
     CA15QGTaggerSubJetsCHS                *                
     CA15NjettinessCHS                   

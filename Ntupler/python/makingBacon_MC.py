@@ -44,20 +44,22 @@ else:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.source = cms.Source("PoolSource",
-  fileNames  = cms.untracked.vstring('file:/afs/cern.ch/work/k/ksung/private/HZZ4lAna/temp/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_FEEEEFFF-7FFB-E111-8FE2-002618943810.root')
+#  fileNames  = cms.untracked.vstring('file:/afs/cern.ch/work/k/ksung/private/HZZ4lAna/temp/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_FEEEEFFF-7FFB-E111-8FE2-002618943810.root')
 #  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/00277FF2-7B84-E211-9475-782BCB27B958.root')
 #  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/0000/00065798-2704-E211-B308-0025901D4C44.root')
 #  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball/AODSIM/PU_S10_START53_V7C-v1/00000/001B91CE-7639-E211-B7D1-00261894385A.root')
+  fileNames  = cms.untracked.vstring('/store/user/jbueghly/BPrime2Xb_X2ll_muonChannel_8TeV/BPrime2Xb_X2ll_muonChannel_8TeV_step2_Zprime/161028_035400/0000/heavyB_STEP2_RAW2DIGI_L1Reco_RECO_VALIDATION_PU_100.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
 
+print 'All loaded...'
 #--------------------------------------------------------------------------------
 # Reporting
 #================================================================================
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool(False),
   Rethrow     = cms.untracked.vstring('ProductNotFound'),
@@ -228,6 +230,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     subJetName         = cms.untracked.string('AK5caPFJetsPruned'),
     csvBTagName        = cms.untracked.string('AK5jetCombinedSecondaryVertexBJetTags'),
     csvBTagSubJetName  = cms.untracked.string('AK5jetCombinedSecondaryVertexBJetTagsSJ'),
+    mvaBTagName        = cms.untracked.string('AK5jetCombinedSecondaryVertexMVABJetTags'),
     jettiness          = cms.untracked.string('AK5Njettiness'),
     qgLikelihood       = cms.untracked.string('AK5QGTagger'),
     qgLikelihoodSubjet = cms.untracked.string('AK5QGTaggerSubJets')
@@ -279,6 +282,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     subJetName         = cms.untracked.string('CA8caPFJetsPrunedCHS'),
     csvBTagName        = cms.untracked.string('CA8jetCombinedSecondaryVertexBJetTagsCHS'),
     csvBTagSubJetName  = cms.untracked.string('CA8jetCombinedSecondaryVertexBJetTagsSJCHS'),
+    mvaBTagName        = cms.untracked.string('CA8jetCombinedSecondaryVertexMVABJetTags'),
     jettiness          = cms.untracked.string('CA8NjettinessCHS'),
     qgLikelihood       = cms.untracked.string('CA8QGTaggerCHS'),
     qgLikelihoodSubjet = cms.untracked.string('CA8QGTaggerSubJetsCHS')
@@ -330,6 +334,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     subJetName         = cms.untracked.string('CA15caPFJetsPrunedCHS'),
     csvBTagName        = cms.untracked.string('CA15jetCombinedSecondaryVertexBJetTagsCHS'),
     csvBTagSubJetName  = cms.untracked.string('CA15jetCombinedSecondaryVertexBJetTagsSJCHS'),
+    mvaBTagName        = cms.untracked.string('CA15jetCombinedSecondaryVertexMVABJetTags'),
     jettiness          = cms.untracked.string('CA15NjettinessCHS'),
     qgLikelihood       = cms.untracked.string('CA15QGTaggerCHS'),
     qgLikelihoodSubjet = cms.untracked.string('CA15QGTaggerSubJetsCHS')
