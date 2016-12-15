@@ -144,6 +144,7 @@ def setMiniAODAK4CHS(process) :
     process.QGTagger.jec                   = cms.InputTag('')
     process.QGTagger.systematicsLabel      = cms.string('')
     process.AK4FlavorCHS.jets              = cms.InputTag('slimmedJets')
+
     process.AK4PUJetIdCHS.jets             = cms.InputTag("slimmedJets")
     process.AK4PUJetIdCHS.inputIsCorrected = True
     process.AK4PUJetIdCHS.vertexes         = cms.InputTag("offlineSlimmedPrimaryVertices")
