@@ -552,12 +552,14 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
         // MVA PUID nonsense
         edm::Handle<edm::ValueMap<float> > puJetIdMVA;
         iEvent.getByToken(fPUMVA, puJetIdMVA);
+        pJet->mva = (*puJetIdMVA)[jetBaseRef];
           
         edm::Handle<edm::ValueMap<int> > puJetIdFlag;
         iEvent.getByToken(fPUID,puJetIdFlag);
-        pJet->mva = (*puJetIdMVA)[jetBaseRef];
+        pJet->puid = (*puJetIdFlag)[jetBaseRef];
 
-        std::cout << "puid: " << pJet->mva << std::endl;
+        std::cout << "puid mva: " << pJet->mva << " ";
+        std::cout << "puid: " << pJet->puid << std::endl;
 
         TVector2 lPull    = JetTools::jetPull(*itJet,0);
         pJet->pullY       = lPull.X();
@@ -576,9 +578,9 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
         pJet->neuHadFrac = itJet->neutralHadronEnergyFraction();
         pJet->muonFrac   = itJet->muonEnergyFraction();
 
-        //
-        // Generator matching
-        //==============================
+        //===================//
+        // Generator matching//
+        //===================//
         const reco::GenJet * matchGenJet = 0;
         if(fUseGen) matchGenJet = match(&(*itJet),genJetCol);
         if(matchGenJet != 0) {
