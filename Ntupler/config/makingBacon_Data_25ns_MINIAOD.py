@@ -215,15 +215,9 @@ runMetCorAndUncFromMiniAOD(process,
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source = cms.Source("PoolSource",
-                            fileNames  = cms.untracked.vstring(
-                                                               #'/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/241/00000/5EFC3048-4829-E611-B02F-02163E011BE2.root'
-                                                               '/store/data/Run2016B/SingleMuon/MINIAOD/PromptReco-v2/000/274/441/00000/502A1457-F02D-E611-A97C-02163E013490.root'
-                                                               #'/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/986/00000/829620EE-E366-E611-A5DF-02163E013945.root',
-                                                               #'/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/986/00000/829620EE-E366-E611-A5DF-02163E013945.root',
-                                                               #'/store/data/Run2016G/JetHT/MINIAOD/PromptReco-v1/000/278/986/00000/E8A8F43B-EA66-E611-9653-FA163E44A048.root'
-                                                               ),
+                            fileNames  = cms.untracked.vstring('file:pickevents.root'),
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")

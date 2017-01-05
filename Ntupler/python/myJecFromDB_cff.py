@@ -4,9 +4,11 @@ from JetMETCorrections.Configuration.JetCorrectorsAllAlgos_cff  import *
 from CondCore.CondDB.CondDB_cfi import *
 
 def setupJEC(process,isData) :
-    label='MC'
     if isData:
         label='DATA'
+    else: 
+        label='MC'
+
     process.jec =  cms.ESSource("PoolDBESSource",
                                 CondDB,
                                 toGet = cms.VPSet(
@@ -21,6 +23,10 @@ def setupJEC(process,isData) :
                           cms.PSet(record  = cms.string('JetCorrectionsRecord'),
                                    tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV6_'+label+'_AK4PFchs'),
                                    label   = cms.untracked.string('AK4chs')
+                                   ),
+                          cms.PSet(record  = cms.string('JetCorrectionsRecord'),
+                                   tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV6_'+label+'_AK4PFchs'),
+                                   label   = cms.untracked.string('AK4PFchs')
                                    ),
                           cms.PSet(record  = cms.string('JetCorrectionsRecord'),
                                    tag     = cms.string('JetCorrectorParametersCollection_Spring16_25nsV6_'+label+'_AK8PFchs'),

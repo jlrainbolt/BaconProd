@@ -262,10 +262,14 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
         fUseAODJet   = cfg.getUntrackedParameter<bool>("useAOD");
         fComputeFullJetInfo = cfg.getUntrackedParameter<bool>("doComputeFullJetInfo");
         if(fIsActiveJet) {
-            fFillerJet = new baconhep::FillerJet(cfg, fUseAODJet,consumesCollector()); assert(fFillerJet);
-            fJetArr = new TClonesArray("baconhep::TJet");       assert(fJetArr);
+            fFillerJet = new baconhep::FillerJet(cfg, fUseAODJet,consumesCollector()); 
+            assert(fFillerJet);
+
+            fJetArr = new TClonesArray("baconhep::TJet");       
+            assert(fJetArr);
             if(fComputeFullJetInfo) {
-                fAddJetArr = new TClonesArray("baconhep::TAddJet"); assert(fAddJetArr);
+                fAddJetArr = new TClonesArray("baconhep::TAddJet"); 
+                assert(fAddJetArr);
             }
         }
     }
@@ -506,7 +510,8 @@ void NtuplerMod::setTriggers(bool iUseTrigger)
 void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-    //if (iEvent.id().event() != 686419626) return;
+    //if (iEvent.id().event() != 683298100 || iEvent.id().event() != 684782270) return;
+    std::cout << iEvent.id().event() << "\t";
 
     fTotalEvents->Fill(1);
     TriggerBits triggerBits;
@@ -529,7 +534,7 @@ void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 triggerBits [fTrigger->fRecords[irec].baconTrigBit] = 1;
             }
         }
-        if(fSkipOnHLTFail && triggerBits == 0) return;  
+        if (fSkipOnHLTFail && triggerBits == 0) return;  
     }
     if(fIsActiveGenInfo) {
         fGenParArr->Clear();
@@ -589,15 +594,20 @@ void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     //  fCaloJetArr->Clear();
     //  if(fUseAOD) { fFillerCaloJet->fill(fCaloJetArr,iEvent, iSetup,fTrigger->fRecords, *hTrgEvt);  }
     //}
+    
     if(fIsActiveJet) {
         fJetArr->Clear();
         if(fComputeFullJetInfo) {
             fAddJetArr->Clear();      
-            if(fUseAODJet) { fFillerJet->fill(fJetArr, fAddJetArr, iEvent, iSetup, *pv, fTrigger->fRecords, hTrgEvtDummy ,hTrgObjsDummy);  }
-            else           { fFillerJet->fill(fJetArr, fAddJetArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
+            if(fUseAODJet) { 
+                fFillerJet->fill(fJetArr, fAddJetArr, iEvent, iSetup, *pv, fTrigger->fRecords, hTrgEvtDummy ,hTrgObjsDummy);  
+            } else { 
+                fFillerJet->fill(fJetArr, fAddJetArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); 
+            }  // (!) consolidate fillers for AOD and MINIAOD
         } else {
-            if(fUseAODJet) { fFillerJet->fill(fJetArr,          0, iEvent, iSetup, *pv, fTrigger->fRecords, hTrgEvtDummy ,hTrgObjsDummy);  }
-            else           { fFillerJet->fill(fJetArr,          0, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
+            if(fUseAODJet) { fFillerJet->fill(fJetArr, 0, iEvent, iSetup, *pv, fTrigger->fRecords, hTrgEvtDummy ,hTrgObjsDummy);  
+            } else { fFillerJet->fill(fJetArr, 0, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); 
+            }  // (!) consolidate fillers for AOD and MINIAOD
         }
     }
     if(fIsActiveFatJet) {
@@ -676,13 +686,13 @@ void NtuplerMod::initHLT(const edm::TriggerResults& result, const edm::TriggerNa
         const std::string pattern = fTrigger->fRecords[irec].hltPattern;
         if(edm::is_glob(pattern)) {  // handle pattern with wildcards (*,?)
             std::vector<std::vector<std::string>::const_iterator> matches = edm::regexMatch(triggerNames.triggerNames(), pattern);
-            if(matches.empty()) {
-                std::cout << "requested pattern [" << pattern << "] does not match any HLT paths" << std::endl;
-            } else {
+            if(!matches.empty()) {
                 BOOST_FOREACH(std::vector<std::string>::const_iterator match, matches) {
                     fTrigger->fRecords[irec].hltPathName = *match;
                 }
-            }
+            } /*else {
+                std::cout << "requested pattern [" << pattern << "] does not match any HLT paths" << std::endl;
+                }*/
         } else {  // take full HLT path name given
             fTrigger->fRecords[irec].hltPathName = pattern;
         }

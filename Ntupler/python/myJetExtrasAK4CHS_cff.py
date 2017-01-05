@@ -86,11 +86,13 @@ AK4NjettinessCHS = Njettiness.clone(
   )
 
 from RecoJets.JetProducers.PileupJetID_cfi  import *
-AK4PUJetIdCHS = pileupJetId.clone(
-  jets=cms.InputTag('ak4PFJetsCHS'),
-  inputIsCorrected=False,
-  applyJec=True,
-  vertexes=cms.InputTag("offlinePrimaryVertices")
+AK4PUJetIdCHS      = pileupJetId.clone(
+  #jets             = cms.InputTag('ak4PFJetsCHS'),
+  #inputIsCorrected = False,
+  jets             = cms.InputTag('slimmedJets'),
+  inputIsCorrected = True,
+  applyJec         = True,
+  vertexes         = cms.InputTag("offlinePrimaryVertices")
   )
 #
 # Define sequences
@@ -148,13 +150,16 @@ def setMiniAODAK4CHS(process) :
     process.AK4PUJetIdCHS.jets             = cms.InputTag("slimmedJets")
     process.AK4PUJetIdCHS.inputIsCorrected = True
     process.AK4PUJetIdCHS.vertexes         = cms.InputTag("offlineSlimmedPrimaryVertices")
+
     process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
     process.patJetCorrFactorsReapplyJEC = process.updatedPatJetCorrFactors.clone(
         src = cms.InputTag("slimmedJets"),
-        levels = ['L1FastJet', 'L2Relative', 'L3Absolute'] 
+        levels = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'] 
         )
+
     process.updatedJets = process.updatedPatJets.clone(
         jetSource = cms.InputTag("slimmedJets"),
         jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
         )
-    process.updatedJets.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+    #process.updatedJets.userData.userFloats.src += ['pileupJetIdUpdated:fullDiscriminant']
+    process.updatedJets.userData.userFloats.src = []

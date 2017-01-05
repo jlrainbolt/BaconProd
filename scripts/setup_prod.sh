@@ -10,7 +10,8 @@ CURRDIR=$PWD
 PATCHDIR=/afs/cern.ch/work/k/ksung/public/Production/11/CMSSW_8_0_20/src
 cd $CMSSW_BASE/src
 
-declare -a PKGS=("DataFormats" "PhysicsTools" "RecoBTag" "RecoBTau" "RecoMET" "ShowerDeconstruction")
+#declare -a PKGS=("DataFormats" "PhysicsTools" "RecoBTag" "RecoBTau" "RecoMET" "ShowerDeconstruction")
+declare -a PKGS=("RecoBTag" "RecoBTau" "ShowerDeconstruction")
 
 for n in "${PKGS[@]}"
 do
