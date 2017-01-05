@@ -4,13 +4,15 @@ import os
 process = cms.Process('MakingBacon')
 
 is_data_flag  = True                                       # flag for if process data
-do_hlt_filter = True                                       # flag to skip events that fail relevant triggers
+do_hlt_filter = False                                      # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"   # list of relevant triggers
 do_alpaca     = False
 
 cmssw_base = os.environ['CMSSW_BASE']
-from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
+from BaconProd.Ntupler.myJecFromDB_cff import setupJEC
 setupJEC(process,is_data_flag)
+process.es_prefer_jec = cms.ESPrefer("PoolDBESSource","jec")
+
 if is_data_flag:
   process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/Spring16_25nsV6_DATA.db')
 else:
@@ -33,7 +35,7 @@ process.load('BaconProd/Ntupler/myCHSCorrections_cff')
 process.load('BaconProd/Ntupler/myCorrections_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 if is_data_flag:
-  process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_miniAODv2')
+  process.GlobalTag.globaltag = cms.string('80X_dataRun2_Prompt_v13')
 else:
   process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_miniAODv2')
 
@@ -96,9 +98,6 @@ process.chs = cms.EDFilter("CandPtrSelector",
                            src = cms.InputTag('packedPFCandidates'),
                            cut = cms.string('fromPV')
                            )
-# PF MET corrections
-from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-
 if is_data_flag:
   process.AK4QGTaggerCHS.jec  = cms.InputTag("ak4chsL1FastL2L3ResidualCorrector")
   process.CA8QGTaggerCHS.jec  = cms.InputTag("ca8chsL1FastL2L3ResidualCorrector")
@@ -160,9 +159,11 @@ if do_alpaca:
   alpacaPuppiMet = ('pfMetPuppiAlpacaData'   if is_data_flag else 'pfMetPuppiAlpacaMC' ) 
 
 #JEC
-JECTag='Spring16_25nsV6_DATA'
-if not is_data_flag: 
-  JECTag='Spring16_25nsV6_MC'
+if is_data_flag: 
+    JECTag='Spring16_25nsV6_DATA'
+else:
+    JECTag='Spring16_25nsV6_MC'
+
 ak4CHSJEC = cms.untracked.vstring('BaconProd/Utils/data/'+JECTag+'_L1FastJet_AK4PFchs.txt',
                                   'BaconProd/Utils/data/'+JECTag+'_L2Relative_AK4PFchs.txt',
                                   'BaconProd/Utils/data/'+JECTag+'_L3Absolute_AK4PFchs.txt',
@@ -195,23 +196,25 @@ ak4PUPPIUnc  = cms.untracked.vstring('BaconProd/Utils/data/'+JECTag+'_Uncertaint
 ak8PUPPIUnc  = cms.untracked.vstring('BaconProd/Utils/data/'+JECTag+'_Uncertainty_AK8PFPuppi.txt')
 ca15PUPPIUnc = ak8PUPPIUnc
 
+### From Olga ###
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+
+process.load("RecoJets.JetProducers.PileupJetID_cfi")
+process.pileupJetIdUpdated = process.pileupJetId.clone(
+  #jets=cms.InputTag("updatedPatJetsReappliedJEC"),
+  jets             = cms.InputTag("slimmedJets"),
+  inputIsCorrected = True,
+  applyJec         = False,
+  vertexes         = cms.InputTag("offlineSlimmedPrimaryVertices")
+)
+
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD(process,
                            isData=is_data_flag,
                            jetCorLabelL3="ak4L1FastL2L3Corrector",
                            jetCorLabelRes="ak4L1FastL2L3ResidualCorrector",
                            )
-#
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=is_data_flag,
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetCollUnskimmed="AK4PFJetsPuppi",
-#                           jetCorLabelL3="ak4PuppiL1FastL2L3Corrector",
-#                           jetCorLabelRes="ak4PuppiL1FastL2L3ResidualCorrector",
-#                           reclusterJets=False,
-#                           jetFlavor="AK4PFPuppi",
-#                           postfix="Puppi"
-#                           )
+
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
@@ -326,7 +329,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
   
   Tau = cms.untracked.PSet(
-    isActive = cms.untracked.bool(True),
+    isActive = cms.untracked.bool(False),
     minPt    = cms.untracked.double(10),
     edmName  = cms.untracked.string('slimmedTaus'),
     edmPuppiName              = cms.untracked.string('puppi'),
@@ -340,8 +343,12 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     minPt                = cms.untracked.double(15),
     coneSize             = cms.untracked.double(0.4),
     doComputeFullJetInfo = cms.untracked.bool(False),
-    doGenJet             = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
+    doGenJet             = (cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True)),
     showerDecoConf       = cms.untracked.string(''),
+
+    ### for PUID bs ###
+    jetsPUIDPF    = cms.InputTag("pileupJetIdUpdated:fullId"),
+    jetsPUIDMVAPF = cms.InputTag("pileupJetIdUpdated:fullDiscriminant"),
     
     edmPVName   = cms.untracked.string('offlineSlimmedPrimaryVertices'),
     jecFiles    = ak4CHSJEC,  
@@ -359,7 +366,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     ),
 
   AK4Puppi = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
+    isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(20),
@@ -399,7 +406,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
 
   AK8CHS = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
+    isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
     coneSize             = cms.untracked.double(0.8),
@@ -465,7 +472,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
                                  
   AK8Puppi = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
+    isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
@@ -505,7 +512,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
 
   CA15CHS = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
+    isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
     coneSize             = cms.untracked.double(1.5),
@@ -541,8 +548,9 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     qgLikelihoodSubjet = cms.untracked.string('CA15QGTaggerSubJetsCHS'),
     topTaggerName      = cms.untracked.string('HEP')
   ),
+
   CA15Puppi = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
+    isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
@@ -594,6 +602,8 @@ process.baconSequence = cms.Sequence(
                                      process.ak4PFJets                *
                                      process.chs                      *
                                      process.ak4PFJetsCHS             *
+                                     process.pileupJetIdUpdated *
+
                                      process.electronMVAValueMapProducer *
                                      process.egmGsfElectronIDs        *
                                      process.egmPhotonIDSequence      * 
@@ -605,7 +615,6 @@ process.baconSequence = cms.Sequence(
                                      process.puppiForMET              *
                                      process.puppiPhoton              *
 
-
                                      process.AK4jetsequencePuppiData  *
                                      process.pfMetPuppi               *
                                      process.producePFMETCorrectionsPuppi*
@@ -614,7 +623,9 @@ process.baconSequence = cms.Sequence(
                                      process.AK8jetsequencePuppiData  *
                                      process.CA15jetsequencePuppiData *
                                      process.btagging                 *
-                                     process.fullPatMetSequence       *
+
+                                     process.fullPatMetSequence *
+
                                      process.ntupler)
 
 #--------------------------------------------------------------------------------
@@ -642,3 +653,5 @@ if is_data_flag:
   assert process.ntupler.AK4CHS.doGenJet  == cms.untracked.bool(False)
   assert process.ntupler.CA8CHS.doGenJet  == cms.untracked.bool(False)
   assert process.ntupler.CA15CHS.doGenJet == cms.untracked.bool(False)
+
+

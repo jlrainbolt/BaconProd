@@ -504,7 +504,7 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
         new(rArray[index]) baconhep::TJet();
         baconhep::TJet *pJet = (baconhep::TJet*)rArray[index];
 
-        std::cout << "(" << ptRaw*jetcorr << ", " << itJet->eta() << ", " << itJet->phi() << ")\t";
+        //std::cout << "(" << ptRaw*jetcorr << ", " << itJet->eta() << ", " << itJet->phi() << ")\t";
 
         //
         // Kinematics
@@ -532,8 +532,8 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
         pJet->cvb  = itJet->bDiscriminator(fCVBctagName);
         pJet->cvl  = itJet->bDiscriminator(fCVLctagName);
 
-        std::cout << "csv: " << pJet->csv << ", "
-                  << "mva: " << pJet->bmva << ", ";
+        //std::cout << "csv: " << pJet->csv << ", "
+        //          << "mva: " << pJet->bmva << ", ";
 
 
         if(fQGLikelihood.size() > 0) { 
@@ -558,8 +558,8 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
         iEvent.getByToken(fPUID,puJetIdFlag);
         pJet->puid = (*puJetIdFlag)[jetBaseRef];
 
-        std::cout << "puid mva: " << pJet->mva << " ";
-        std::cout << "puid: " << pJet->puid << std::endl;
+        //std::cout << "puid mva: " << pJet->mva << " ";
+        //std::cout << "puid: " << pJet->puid << std::endl;
 
         TVector2 lPull    = JetTools::jetPull(*itJet,0);
         pJet->pullY       = lPull.X();

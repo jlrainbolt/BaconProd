@@ -514,7 +514,7 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
         assert(hMETProduct.isValid());
         const pat::MET &inMET = hMETProduct->front();
 
-        std::cout << inMET.uncorPt() << ", " << inMET.pt() << std::endl;
+        //std::cout << inMET.uncorPt() << ", " << inMET.pt() << std::endl;
 
         // Raw PF MET
         evtInfo->pfMET      = inMET.uncorPt();

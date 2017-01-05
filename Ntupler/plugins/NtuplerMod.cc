@@ -510,8 +510,7 @@ void NtuplerMod::setTriggers(bool iUseTrigger)
 void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-    //if (iEvent.id().event() != 683298100 || iEvent.id().event() != 684782270) return;
-    std::cout << iEvent.id().event() << "\t";
+    //std::cout << iEvent.id().event() << "\t";
 
     fTotalEvents->Fill(1);
     TriggerBits triggerBits;
