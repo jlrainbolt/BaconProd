@@ -1,3 +1,4 @@
+<use name="root"/>
 <use name="BaconAna/DataFormats"/>
 <use name="BaconProd/Utils"/>
 <use name="TrackingTools/IPTools"/>
@@ -13,6 +14,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="fastjet"/>
 <use name="fastjet-contrib"/>
+<use name="RecoVertex/KalmanVertexFit"/>
 <flags CXXFLAGS="-g -Wall"/>
 <export>
   <lib name="1"/>
