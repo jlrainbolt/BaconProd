@@ -125,6 +125,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
   fGenFatJetArr      (0),
   fEleArr            (0),
   fMuonArr           (0),
+  fdimuonArr         (0),
   fTauArr            (0),
   fJetArr            (0),
   fFatJetArr         (0),
@@ -228,6 +229,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
     fIsActiveMuon = cfg.getUntrackedParameter<bool>("isActive");
     if(fIsActiveMuon) {
       fMuonArr    = new TClonesArray("baconhep::TMuon");    assert(fMuonArr);
+      fdimuonArr  = new TClonesArray("baconhep::TVertex");  assert(fdimuonArr);
       fFillerMuon = new baconhep::FillerMuon(cfg, fUseAOD,consumesCollector()); assert(fFillerMuon);
     }
   }  
@@ -402,6 +404,7 @@ NtuplerMod::~NtuplerMod()
   delete fGenJetArr;
   delete fEleArr;
   delete fMuonArr;
+  delete fdimuonArr;
   delete fTauArr;
   //delete fCaloJetArr;
   delete fJetArr;
@@ -443,7 +446,10 @@ void NtuplerMod::beginJob()
   if(fIsActiveGenJet)    { fEventTree->Branch("GenJet"     ,&fGenJetArr);}
   if(fIsActiveGenFatJet) { fEventTree->Branch("GenFatJet"  ,&fGenFatJetArr);}
   if(fIsActiveEle)    { fEventTree->Branch("Electron", &fEleArr); }
-  if(fIsActiveMuon)   { fEventTree->Branch("Muon",     &fMuonArr); }
+  if(fIsActiveMuon) { 
+      fEventTree->Branch("Muon", &fMuonArr);
+      fEventTree->Branch("DimuonVertex", &fdimuonArr);
+  }
   if(fIsActiveTau)    { fEventTree->Branch("Tau",      &fTauArr); }
   if(fIsActivePhoton) { fEventTree->Branch("Photon",   &fPhotonArr); }
   if(fIsActivePV)     { fEventTree->Branch("PV",       &fPVArr); }
@@ -572,8 +578,9 @@ void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   }
   if(fIsActiveMuon) {
     fMuonArr->Clear();  
+    fdimuonArr->Clear();
     if(fUseAOD) { fFillerMuon->fill(fMuonArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgEvt);  }
-    else        { fFillerMuon->fill(fMuonArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
+    else        { fFillerMuon->fill(fMuonArr, fdimuonArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
   }
   if(fIsActivePhoton) {
     fPhotonArr->Clear();

@@ -2,6 +2,7 @@
 #include "BaconProd/Utils/interface/TriggerTools.hh"
 #include "BaconAna/DataFormats/interface/BaconAnaDefs.hh"
 #include "BaconAna/DataFormats/interface/TMuon.hh"
+#include "BaconAna/DataFormats/interface/TVertex.hh"
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
@@ -335,11 +336,13 @@ void FillerMuon::fill(TClonesArray *array,
 
 // === filler for MINIAOD ===
 void FillerMuon::fill(TClonesArray *array,
+                      TClonesArray *array2,
                       const edm::Event &iEvent, const edm::EventSetup &iSetup, const reco::Vertex &pv,
                       const std::vector<TriggerRecord> &triggerRecords,
                       const pat::TriggerObjectStandAloneCollection &triggerObjects)
 {
   assert(array);
+  assert(array2);
 
   const pat::PackedCandidateCollection *pfPuppi      = 0;
   const pat::PackedCandidateCollection *pfPuppiNoLep = 0;
@@ -498,6 +501,11 @@ void FillerMuon::fill(TClonesArray *array,
     for(pat::MuonCollection::const_iterator itMu2 = itMu; itMu2!=muonCol->end(); ++itMu2) {
         if(itMu2 == itMu) continue;
         if(itMu2->pt() < fMinPt) continue;
+        TClonesArray &rArray2 = *array2;
+        assert(rArray2.GetEntries() < rArray2.GetSize());
+        const int index2 = rArray2.GetEntries();
+        new(rArray2[index2]) baconhep::TVertex();
+        baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
         baconhep::TMuon *pMuon2 = new baconhep::TMuon;
         
         pMuon2->muIndex = itMu2 - muonCol->begin();
@@ -508,18 +516,24 @@ void FillerMuon::fill(TClonesArray *array,
         pMuon2->ptErr  = itMu2->muonBestTrack()->ptError();
         pMuon2->q      = itMu2->muonBestTrack()->charge();
         
-        //const reco::TransientTrack &tt = transientTrackBuilder->build(itMu->muonBestTrack());
         const reco::TransientTrack &tt2 = transientTrackBuilder->build(itMu2->muonBestTrack());
         std::vector<reco::TransientTrack> t_tks = {tt,tt2};
 
         KalmanVertexFitter fitter;
         TransientVertex myVertex = fitter.vertex(t_tks);
-        if(myVertex.isValid()) {
-            //std::cout << "Position: " << myVertex.position() << 
-                //"Index: " << pMuon2->muIndex << std::endl;
-            TVector3 vPos(myVertex.position().x(), myVertex.position().y(), myVertex.position().z());
-            pMuon->dimuonVertex[pMuon2->muIndex] = vPos;
+        savedVertex->index1 = pMuon->muIndex;
+        savedVertex->index2 = pMuon2->muIndex;
+        savedVertex->isValid = myVertex.isValid();
+        savedVertex->chi2 = myVertex.totalChiSquared();
+        savedVertex->ndof = myVertex.degreesOfFreedom();
+        if (myVertex.isValid()) {
+        savedVertex->x = myVertex.position().x();
+        savedVertex->y = myVertex.position().y();
+        savedVertex->z = myVertex.position().z();
         }
+        //savedVertex->xerr = myVertex.positionError().x();
+        //savedVertex->yerr = myVertex.positionError().y();
+        //savedVertex->zerr = myVertex.positionError().z();
     delete pMuon2;
     }
   }
