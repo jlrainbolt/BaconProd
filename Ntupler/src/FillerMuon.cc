@@ -18,7 +18,14 @@
 
 #include <map>
 
+static const double MUON_MASS = 0.105658369;
+
 using namespace baconhep;
+
+template<class T>
+void copy_p4(const T* lhs, float mass, TLorentzVector& rhs) {
+        rhs.SetPtEtaPhiM(lhs->pt, lhs->eta, lhs->phi, mass);
+}
 
 //--------------------------------------------------------------------------------------------------
 FillerMuon::FillerMuon(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
@@ -501,15 +508,24 @@ void FillerMuon::fill(TClonesArray *array,
     for(pat::MuonCollection::const_iterator itMu2 = itMu; itMu2!=muonCol->end(); ++itMu2) {
         if(itMu2 == itMu) continue;
         if(itMu2->pt() < fMinPt) continue;
+        baconhep::TMuon *pMuon2 = new baconhep::TMuon;
+        
+        pMuon2->muIndex = itMu2 - muonCol->begin();
+        TLorentzVector muon1P4, muon2P4;
+        copy_p4(pMuon, MUON_MASS, muon1P4);
+        copy_p4(pMuon2, MUON_MASS, muon2P4);
+        TLorentzVector dimuon = muon1P4 + muon2P4;
+        float mDimuon = dimuon.M();
+        if (!(((2.0 < mDimuon) && (mDimuon < 4.0)) || ((75.0 < mDimuon) && (mDimuon < 107.0))))
+            continue;
+        
         TClonesArray &rArray2 = *array2;
         assert(rArray2.GetEntries() < rArray2.GetSize());
         const int index2 = rArray2.GetEntries();
         new(rArray2[index2]) baconhep::TVertex();
         baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
-        baconhep::TMuon *pMuon2 = new baconhep::TMuon;
-        
-        pMuon2->muIndex = itMu2 - muonCol->begin();
-        
+            
+
         pMuon2->pt     = itMu2->muonBestTrack()->pt();
         pMuon2->eta    = itMu2->muonBestTrack()->eta();
         pMuon2->phi    = itMu2->muonBestTrack()->phi();
@@ -531,9 +547,6 @@ void FillerMuon::fill(TClonesArray *array,
         savedVertex->y = myVertex.position().y();
         savedVertex->z = myVertex.position().z();
         }
-        //savedVertex->xerr = myVertex.positionError().x();
-        //savedVertex->yerr = myVertex.positionError().y();
-        //savedVertex->zerr = myVertex.positionError().z();
     delete pMuon2;
     }
   }
