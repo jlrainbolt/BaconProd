@@ -67,6 +67,9 @@ const reco::Vertex* FillerVertex::fill(TClonesArray *array, int &nvtx, const edm
     pVertex->x          = itVtx->x();
     pVertex->y          = itVtx->y();
     pVertex->z          = itVtx->z();
+    pVertex->xerr       = itVtx->xError();
+    pVertex->yerr       = itVtx->yError();
+    pVertex->zerr       = itVtx->zError();
   }
   return pv;
 }

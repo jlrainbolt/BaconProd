@@ -546,6 +546,9 @@ void FillerMuon::fill(TClonesArray *array,
         savedVertex->x = myVertex.position().x();
         savedVertex->y = myVertex.position().y();
         savedVertex->z = myVertex.position().z();
+        savedVertex->xerr = myVertex.positionError().cxx();
+        savedVertex->yerr = myVertex.positionError().cyy();
+        savedVertex->zerr = myVertex.positionError().czz();
         }
     delete pMuon2;
     }
