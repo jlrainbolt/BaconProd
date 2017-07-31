@@ -2,6 +2,7 @@
 #include "BaconProd/Utils/interface/TriggerTools.hh"
 #include "BaconAna/DataFormats/interface/TElectron.hh"
 #include "BaconAna/DataFormats/interface/BaconAnaDefs.hh"
+#include "BaconAna/DataFormats/interface/TVertex.hh"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
@@ -9,6 +10,9 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+#include "RecoVertex/KalmanVertexFit/interface/SimpleVertexTree.h"
+#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include <TClonesArray.h>
@@ -16,7 +20,14 @@
 #include <TMath.h>
 #include <utility>
 
+static const double ELE_MASS = 0.000511;
+
 using namespace baconhep;
+
+template<class T>
+void copy_p4(const T* lhs, float mass, TLorentzVector& rhs) {
+        rhs.SetPtEtaPhiM(lhs->pt, lhs->eta, lhs->phi, mass);
+}
 
 //--------------------------------------------------------------------------------------------------
 FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
@@ -289,12 +300,14 @@ void FillerElectron::fill(TClonesArray *array,
 
 // === filler for MINIAOD ===
 void FillerElectron::fill(TClonesArray *array,
+                          TClonesArray *array2,
                           const edm::Event &iEvent, const edm::EventSetup &iSetup,
                           const reco::Vertex &pv,
                           const std::vector<TriggerRecord> &triggerRecords,
                           const pat::TriggerObjectStandAloneCollection &triggerObjects)
 {
   assert(array);
+  assert(array2);
 
   // Get electron collection
   edm::Handle<pat::ElectronCollection> hEleProduct;
@@ -323,6 +336,11 @@ void FillerElectron::fill(TClonesArray *array,
     assert(hPuppiNoLepProduct.isValid());
     pfPuppiNoLep = hPuppiNoLepProduct.product();
   }
+  
+  // Track builder for computing 3D impact parameter
+  edm::ESHandle<TransientTrackBuilder> hTransientTrackBuilder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",hTransientTrackBuilder);
+  const TransientTrackBuilder *transientTrackBuilder = hTransientTrackBuilder.product();  
 
   for(pat::ElectronCollection::const_iterator itEle = eleCol->begin(); itEle!=eleCol->end(); ++itEle) {
 
@@ -338,6 +356,8 @@ void FillerElectron::fill(TClonesArray *array,
     const int index = rElectronArr.GetEntries();
     new(rElectronArr[index]) baconhep::TElectron();
     baconhep::TElectron *pElectron = (baconhep::TElectron*)rElectronArr[index];
+    
+    pElectron->eleIndex = itEle - eleCol->begin();
 
 
     //
@@ -404,6 +424,7 @@ void FillerElectron::fill(TClonesArray *array,
     //
     // Impact Parameter
     //==============================
+    const reco::TransientTrack &tt = transientTrackBuilder->build(gsfTrack);
     if(gsfTrack.isNonnull()) {
       pElectron->d0    = (-1)*(gsfTrack->dxy(pv.position()));  // note: d0 = -dxy
       pElectron->dz    = gsfTrack->dz(pv.position());
@@ -466,6 +487,59 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->trkID = -1;  // general tracks not in MINIAOD
 
     pElectron->hltMatchBits = TriggerTools::matchHLT(pElectron->eta, pElectron->phi, triggerRecords, triggerObjects);
+
+    // Loop over other electrons and fit dielectron vertices
+    if(itEle == eleCol->end()) continue;
+    for(pat::ElectronCollection::const_iterator itEle2 = itEle; itEle2!=eleCol->end(); ++itEle2) {
+        if(itEle2 == itEle) continue;
+        if(itEle2->pt() < fMinPt) continue;
+        baconhep::TElectron *pElectron2 = new baconhep::TElectron;
+        
+        pElectron2->pt         = itEle->pt();
+        pElectron2->eta        = itEle->eta();
+        pElectron2->phi        = itEle->phi();
+        pElectron2->q          = itEle->charge();
+        pElectron2->ecalEnergy = itEle->ecalEnergy();
+        pElectron2->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
+        pElectron2->scEta      = sc->eta();
+        pElectron2->scPhi      = sc->phi();
+        
+        pElectron2->eleIndex = itEle2 - eleCol->begin();
+        
+        TLorentzVector elec1P4, elec2P4;
+        copy_p4(pElectron, ELE_MASS, elec1P4);
+        copy_p4(pElectron2, ELE_MASS, elec2P4);
+        TLorentzVector dielec = elec1P4 + elec2P4;
+        float mDielec = dielec.M();
+        if (!(((2.0 < mDielec) && (mDielec < 4.0)) || ((75.0 < mDielec) && (mDielec < 107.0))))
+            continue;
+        
+        TClonesArray &rArray2 = *array2;
+        assert(rArray2.GetEntries() < rArray2.GetSize());
+        const int index2 = rArray2.GetEntries();
+        new(rArray2[index2]) baconhep::TVertex();
+        baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
+             
+        const reco::TransientTrack &tt2 = transientTrackBuilder->build(itEle2->gsfTrack());
+        std::vector<reco::TransientTrack> t_tks = {tt,tt2};
+    
+        KalmanVertexFitter fitter;
+        TransientVertex myVertex = fitter.vertex(t_tks);
+        savedVertex->index1 = pElectron->eleIndex;
+        savedVertex->index2 = pElectron2->eleIndex;
+        savedVertex->isValid = myVertex.isValid();
+        savedVertex->chi2 = myVertex.totalChiSquared();
+        savedVertex->ndof = myVertex.degreesOfFreedom();
+        if (myVertex.isValid()) {
+        savedVertex->x = myVertex.position().x();
+        savedVertex->y = myVertex.position().y();
+        savedVertex->z = myVertex.position().z();
+        savedVertex->xerr = myVertex.positionError().cxx();
+        savedVertex->yerr = myVertex.positionError().cyy();
+        savedVertex->zerr = myVertex.positionError().czz();
+        }
+    delete pElectron2;
+    }
   }
 }
 

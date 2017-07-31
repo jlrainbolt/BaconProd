@@ -124,6 +124,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
   fGenJetArr         (0),
   fGenFatJetArr      (0),
   fEleArr            (0),
+  fdielectronArr         (0),
   fMuonArr           (0),
   fdimuonArr         (0),
   fTauArr            (0),
@@ -220,6 +221,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
     fIsActiveEle = cfg.getUntrackedParameter<bool>("isActive");
     if(fIsActiveEle) {
       fEleArr    = new TClonesArray("baconhep::TElectron");    assert(fEleArr);
+      fdielectronArr  = new TClonesArray("baconhep::TVertex");  assert(fdielectronArr);
       fFillerEle = new baconhep::FillerElectron(cfg, fUseAOD,consumesCollector()); assert(fFillerEle);
     }
   }  
@@ -403,6 +405,7 @@ NtuplerMod::~NtuplerMod()
   delete fGenParArr;
   delete fGenJetArr;
   delete fEleArr;
+  delete fdielectronArr;
   delete fMuonArr;
   delete fdimuonArr;
   delete fTauArr;
@@ -445,7 +448,10 @@ void NtuplerMod::beginJob()
   }
   if(fIsActiveGenJet)    { fEventTree->Branch("GenJet"     ,&fGenJetArr);}
   if(fIsActiveGenFatJet) { fEventTree->Branch("GenFatJet"  ,&fGenFatJetArr);}
-  if(fIsActiveEle)    { fEventTree->Branch("Electron", &fEleArr); }
+  if(fIsActiveEle)    { 
+      fEventTree->Branch("Electron", &fEleArr); 
+      fEventTree->Branch("DielectronVertex", &fdielectronArr);
+  }
   if(fIsActiveMuon) { 
       fEventTree->Branch("Muon", &fMuonArr);
       fEventTree->Branch("DimuonVertex", &fdimuonArr);
@@ -573,8 +579,9 @@ void NtuplerMod::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   }
   if(fIsActiveEle) {
     fEleArr->Clear();
+    fdielectronArr->Clear();
     if(fUseAOD) { fFillerEle->fill(fEleArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgEvt);  }
-    else        { fFillerEle->fill(fEleArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
+    else        { fFillerEle->fill(fEleArr, fdielectronArr, iEvent, iSetup, *pv, fTrigger->fRecords, *hTrgObjs); }  // (!) consolidate fillers for AOD and MINIAOD
   }
   if(fIsActiveMuon) {
     fMuonArr->Clear();  

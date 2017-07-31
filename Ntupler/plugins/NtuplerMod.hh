@@ -138,6 +138,7 @@ class NtuplerMod : public edm::EDAnalyzer {
     TClonesArray            *fGenJetArr;
     TClonesArray            *fGenFatJetArr;
     TClonesArray	    *fEleArr;
+    TClonesArray	    *fdielectronArr;
     TClonesArray	    *fMuonArr;
     TClonesArray	    *fdimuonArr;
     TClonesArray	    *fTauArr;
