@@ -87,11 +87,13 @@ void FillerGenInfo::fill(TGenEventInfo *genEvtInfo, TClonesArray *particlesArr, 
     if(!fFillAll) {
       bool skip=true;
 
-      if(itGenP->status()>20 && itGenP->status()<30)           { skip = false; }  // keep particles from hard scatter process
-      if(abs(itGenP->pdgId())>= 5 && abs(itGenP->pdgId())<= 8) { skip = false; }  // keep b, t, b', t'
-      if(abs(itGenP->pdgId())>=11 && abs(itGenP->pdgId())<=18) { skip = false; }  // keep leptons
-      if(abs(itGenP->pdgId())>=23 && abs(itGenP->pdgId())<=39) { skip = false; }  // keep bosons except photons and gluons
-      if(abs(itGenP->pdgId())>10000)                           { skip = false; }  // keep exotic particles
+      if(itGenP->status()>20 && itGenP->status()<30)                { skip = false; }  // keep particles from hard scatter process
+      if(abs(itGenP->pdgId())>= 5 && abs(itGenP->pdgId())<= 8)      { skip = false; }  // keep b, t, b', t'
+      if(abs(itGenP->pdgId())>=11 && abs(itGenP->pdgId())<=18)      { skip = false; }  // keep leptons
+      if(abs(itGenP->pdgId())>=23 && abs(itGenP->pdgId())<=39)      { skip = false; }  // keep bosons except photons and gluons
+      if(abs(itGenP->pdgId())>=400 && abs(itGenP->pdgId())<=600)    { skip = false; }  // keep charmed and bottom mesons
+      if(abs(itGenP->pdgId())>=5000 && abs(itGenP->pdgId())<=6000)  { skip = false; }  // keep bottom baryons
+      if(abs(itGenP->pdgId())>10000)                                { skip = false; }  // keep exotic particles
 
       // photons (e.g. for FSR/ISR) and u,d,c,s-quarks (e.g. hadronic boson decays) coming from a previously stored particle
       if(itGenP->pdgId()==22 || (abs(itGenP->pdgId())>0 && abs(itGenP->pdgId())<5)) {
