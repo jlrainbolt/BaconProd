@@ -10,10 +10,10 @@ MVAMetSeqData = cms.Sequence(ak4PFJetsL1FastL2L3Residual * pfMVAMEtSequence)
 
 
 
-from RecoMET.METPUSubtraction.objectSelection_miniAOD_cff import addLeptons
+#from RecoMET.METPUSubtraction.objectSelection_miniAOD_cff import addLeptons
 
 def setMiniAODMVAMet(process):
-    addLeptons(process)
+    #addLeptons(process)
     process.load("RecoJets.JetProducers.ak4PFJets_cfi")
     process.ak4PFJets.src = cms.InputTag("packedPFCandidates")
     process.ak4PFJets.doAreaFastjet = cms.bool(True)

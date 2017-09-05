@@ -26,7 +26,6 @@ process.load('FWCore/MessageService/MessageLogger_cfi')
 #process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load('Configuration/StandardSequences/GeometryDB_cff')
 process.load('Configuration/StandardSequences/MagneticField_38T_cff')
-
 process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 
 process.pfNoPileUpJME = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
@@ -35,9 +34,9 @@ process.load('BaconProd/Ntupler/myCHSCorrections_cff')
 process.load('BaconProd/Ntupler/myCorrections_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 if is_data_flag:
-  process.GlobalTag.globaltag = cms.string('80X_dataRun2_Prompt_v13')
+  process.GlobalTag.globaltag = cms.string('92X_dataRun2_Prompt_v4')
 else:
-  process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_miniAODv2')
+  process.GlobalTag.globaltag = cms.string('92X_mcRun2_asymptotic_2016_miniAODv2')
 
 
 #--------------------------------------------------------------------------------
@@ -220,7 +219,7 @@ runMetCorAndUncFromMiniAOD(process,
 #================================================================================
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source = cms.Source("PoolSource",
-                            fileNames  = cms.untracked.vstring('file:pickevents.root'),
+                            fileNames  = cms.untracked.vstring('/store/data/Run2017C/SingleMuon/MINIAOD/PromptReco-v2/000/299/958/00000/4CF91855-0B76-E711-AE36-02163E01A1BC.root'),
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -604,9 +603,9 @@ process.baconSequence = cms.Sequence(
                                      process.ak4PFJetsCHS             *
                                      process.pileupJetIdUpdated *
 
-                                     process.electronMVAValueMapProducer *
-                                     process.egmGsfElectronIDs        *
+                                     #process.egmGsfElectronIDs        *
                                      process.egmPhotonIDSequence      * 
+                                     #process.electronMVAValueMapProducer *
                                      process.pfCandNoLep              *
                                      process.pfCandLep                *
                                      process.pfNoPileUpJME            *
