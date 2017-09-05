@@ -4,7 +4,6 @@
 #include "BaconProd/Utils/interface/TriggerTools.hh"
 #include "BaconProd/Utils/interface/JetPUIDMVACalculator.hh"
 #include "BaconProd/Utils/interface/BoostedBtaggingMVACalculator.hh"
-#include "BaconProd/Utils/interface/ShowerDeco.hh"
 #include "BaconProd/Utils/interface/EnergyCorrelations.h"
 #include "BaconAna/DataFormats/interface/TAddJet.hh"
 #include "DataFormats/BTauReco/interface/BoostedDoubleSVTagInfo.h"
@@ -109,7 +108,6 @@ namespace baconhep
             std::string fLowPtWeightFile;
             std::string fHighPtWeightFile;
             std::string fWeightFile;
-            std::string fShowerDecoConf;
             double      fConeSize;
             bool        fComputeFullJetInfo;
 
@@ -117,7 +115,6 @@ namespace baconhep
             JetPUIDMVACalculator fJetPUIDMVACalc;
             BoostedBtaggingMVACalculator fJetBoostedBtaggingMVACalc;
 
-            ShowerDeco*          fShowerDeco;
 
             // Random number generator for Q-jet volatility
             TRandom2* fRand;

@@ -69,10 +69,8 @@ FillerJet::FillerJet(const edm::ParameterSet &iConfig, const bool useAOD,edm::Co
     fQGLikelihood       (iConfig.getUntrackedParameter<std::string>("qgLikelihood","QGLikelihood")),
     fQGLikelihoodSubJets(iConfig.getUntrackedParameter<std::string>("qgLikelihoodSubjet","QGLikelihood")),
     fTopTaggerName      (iConfig.getUntrackedParameter<std::string>("topTaggerName","")),
-    fShowerDecoConf     (iConfig.getUntrackedParameter<std::string>("showerDecoConf","")),
     fConeSize           (iConfig.getUntrackedParameter<double>("coneSize",0.4)),
     fComputeFullJetInfo (iConfig.getUntrackedParameter<bool>("doComputeFullJetInfo",false)),  
-    fShowerDeco         (0),
     fJetCorr            (0),
     fJetUnc             (0),
     fUseAOD             (useAOD)
@@ -99,9 +97,6 @@ FillerJet::FillerJet(const edm::ParameterSet &iConfig, const bool useAOD,edm::Co
     }
 
     fRand = new TRandom2();
-    if(fShowerDecoConf.size() > 0) { 
-        fShowerDeco = new ShowerDeco(cmssw_base_src+fShowerDecoConf);
-    }
     fTokRhoTag        = iC.consumes<double>               (fRhoName);
     if(fUseAOD)  fTokJetName       = iC.consumes<reco::PFJetCollection>(fJetName);
     if(!fUseAOD) fTokPatJetName    = iC.consumes<pat::JetCollection>   (fJetName);
@@ -680,7 +675,6 @@ void FillerJet::addJet(baconhep::TAddJet *pAddJet, const edm::Event &iEvent,
     pAddJet->tau3 = (*(hTau3.product()))[jetBaseRef];
     pAddJet->tau4 = (*(hTau4.product()))[jetBaseRef];
     pAddJet->doublecsv = (*(hCSVDoubleBtag.product()))[jetBaseRef];
-    //if(fShowerDeco != 0) { 
     std::vector<reco::CandidatePtr> pfConstituents = itJet.getJetConstituents();                                                                                                                     
     std::vector<fastjet::PseudoJet>   lClusterParticles;                                                                                                                                     
     for(unsigned int ic=0; ic<pfConstituents.size(); ic++) {                                                                                                                                         
@@ -689,7 +683,6 @@ void FillerJet::addJet(baconhep::TAddJet *pAddJet, const edm::Event &iEvent,
         lClusterParticles.push_back(pPart);                                                                                                                                                       
     }                                                                           
     std::sort(lClusterParticles.begin(),lClusterParticles.end(),JetTools::orderPseudoJet);
-    if(fShowerDeco != 0) pAddJet->topchi2 = fShowerDeco->chi(itJet.pt(),lClusterParticles);
     fastjet::JetDefinition lCJet_def(fastjet::cambridge_algorithm, 2.0);
     fastjet::ClusterSequence lCClust_seq(lClusterParticles, lCJet_def);
     std::vector<fastjet::PseudoJet> inclusive_jets = lCClust_seq.inclusive_jets(0);
