@@ -720,10 +720,10 @@ void NtuplerMod::endRun  (const edm::Run& iRun, const edm::EventSetup& iSetup){
     if(fIsActiveGenInfo) { 
         // Get generator event information
         edm::Handle<GenRunInfoProduct> hGenRunInfoProduct;
-        iRun.getByToken(fTokGenRunInfo,hGenRunInfoProduct);
-        assert(hGenRunInfoProduct.isValid());
-        fXS = float(hGenRunInfoProduct->crossSection());
-        std::cout << "===> cross section => " << fXS << " -- " << hGenRunInfoProduct->externalXSecLO().value() << " -- " << hGenRunInfoProduct->externalXSecNLO().value()  << " -- " << hGenRunInfoProduct->filterEfficiency()  << std::endl;
+        //iRun.getByToken(fTokGenRunInfo,hGenRunInfoProduct);
+        //assert(hGenRunInfoProduct.isValid());
+        //fXS = float(hGenRunInfoProduct->crossSection());
+        //std::cout << "===> cross section => " << fXS << " -- " << hGenRunInfoProduct->externalXSecLO().value() << " -- " << hGenRunInfoProduct->externalXSecNLO().value()  << " -- " << hGenRunInfoProduct->filterEfficiency()  << std::endl;
     }
 
 }
