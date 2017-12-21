@@ -495,14 +495,14 @@ void FillerElectron::fill(TClonesArray *array,
         if(itEle2->pt() < fMinPt) continue;
         baconhep::TElectron *pElectron2 = new baconhep::TElectron;
         
-        pElectron2->pt         = itEle->pt();
-        pElectron2->eta        = itEle->eta();
-        pElectron2->phi        = itEle->phi();
-        pElectron2->q          = itEle->charge();
-        pElectron2->ecalEnergy = itEle->ecalEnergy();
-        pElectron2->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
-        pElectron2->scEta      = sc->eta();
-        pElectron2->scPhi      = sc->phi();
+        pElectron2->pt         = itEle2->pt();
+        pElectron2->eta        = itEle2->eta();
+        pElectron2->phi        = itEle2->phi();
+        pElectron2->q          = itEle2->charge();
+        pElectron2->ecalEnergy = itEle2->ecalEnergy();
+        //pElectron2->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
+        //pElectron2->scEta      = sc->eta();
+        //pElectron2->scPhi      = sc->phi();
         
         pElectron2->eleIndex = itEle2 - eleCol->begin();
         
