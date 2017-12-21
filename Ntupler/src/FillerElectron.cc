@@ -43,6 +43,10 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fUsePuppi              (iConfig.getUntrackedParameter<bool>("usePuppi",true)),
   fEcalPFClusterIsoMapTag(iConfig.getUntrackedParameter<edm::InputTag>("edmEcalPFClusterIsoMapTag")),
   fHcalPFClusterIsoMapTag(iConfig.getUntrackedParameter<edm::InputTag>("edmHcalPFClusterIsoMapTag")),
+  fEleMediumIdMapTag     (iConfig.getUntrackedParameter<edm::InputTag>("edmEleMediumIdMapTag")),
+  fEleTightIdMapTag      (iConfig.getUntrackedParameter<edm::InputTag>("edmEleTightIdMapTag")),
+  fMVAValuesMapTag       (iConfig.getUntrackedParameter<edm::InputTag>("edmMVAValuesTag")),
+  fMVACatsMapTag         (iConfig.getUntrackedParameter<edm::InputTag>("edmMVACatsTag")),
   fUseAOD                (useAOD)
 {
   if(fUseAOD)  fTokEleName        = iC.consumes<reco::GsfElectronCollection>(fEleName);
@@ -58,6 +62,10 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fTokConvName       = iC.consumes<reco::ConversionCollection>(fConvName);
   fTokEcalPFClusterIsoMap = iC.consumes<edm::ValueMap<float> >(fEcalPFClusterIsoMapTag);
   fTokHcalPFClusterIsoMap = iC.consumes<edm::ValueMap<float> >(fHcalPFClusterIsoMapTag);
+  fTokEleMediumIdMap      = iC.consumes<edm::ValueMap<bool>  >(fEleMediumIdMapTag);  
+  fTokEleTightIdMap       = iC.consumes<edm::ValueMap<bool>  >(fEleTightIdMapTag);  
+  fTokEleMVAValuesMap     = iC.consumes<edm::ValueMap<float> >(fMVAValuesMapTag);  
+  fTokEleMVACatsMap       = iC.consumes<edm::ValueMap<int>   >(fMVACatsMapTag);  
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -321,6 +329,22 @@ void FillerElectron::fill(TClonesArray *array,
   assert(hSCProduct.isValid());
   const reco::SuperClusterCollection *scCol = hSCProduct.product();
 
+  edm::Handle<edm::ValueMap<bool> > hEleMediumIdMap;
+  iEvent.getByToken(fTokEleMediumIdMap,hEleMediumIdMap);
+  assert(hEleMediumIdMap.isValid());
+
+  edm::Handle<edm::ValueMap<bool> > hEleTightIdMap;
+  iEvent.getByToken(fTokEleTightIdMap,hEleTightIdMap);
+  assert(hEleTightIdMap.isValid());
+
+  edm::Handle<edm::ValueMap<float> > hMVAValuesMap;
+  iEvent.getByToken(fTokEleMVAValuesMap,hMVAValuesMap);
+  assert(hMVAValuesMap.isValid());
+
+  edm::Handle<edm::ValueMap<int> > hMVACatsMap;
+  iEvent.getByToken(fTokEleMVACatsMap,hMVACatsMap);
+  assert(hMVACatsMap.isValid());
+
   const pat::PackedCandidateCollection *pfPuppi      = 0;
   const pat::PackedCandidateCollection *pfPuppiNoLep = 0;
   if(fUsePuppi) { 
@@ -346,6 +370,7 @@ void FillerElectron::fill(TClonesArray *array,
 
     const reco::GsfTrackRef gsfTrack = itEle->gsfTrack();
     const reco::SuperClusterRef sc   = itEle->superCluster();
+    edm::RefToBase<reco::GsfElectron> eleBaseRef( edm::Ref<pat::ElectronCollection>(hEleProduct, itEle - eleCol->begin()) );
 
     // electron pT cut
     if(itEle->pt() < fMinPt) continue;
@@ -364,6 +389,8 @@ void FillerElectron::fill(TClonesArray *array,
     // Kinematics
     //==============================
     pElectron->pt         = itEle->pt();
+    pElectron->regscale   = itEle->ecalRegressionScale();
+    pElectron->regsmear   = itEle->ecalRegressionSmear();
     pElectron->eta        = itEle->eta();
     pElectron->phi        = itEle->phi();
     pElectron->q          = itEle->charge();
@@ -447,8 +474,13 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->dEtaIn     = itEle->deltaEtaSuperClusterTrackAtVtx();
     pElectron->dPhiIn     = itEle->deltaPhiSuperClusterTrackAtVtx();
 
-    pElectron->mva = -999;
-    pElectron->isConv = !itEle->passConversionVeto();
+    pElectron->mvaBit     = 0; 
+    if((*hEleMediumIdMap)[eleBaseRef]) pElectron->mvaBit     |=  baconhep::kEleMVAMedBit;
+    if((*hEleTightIdMap) [eleBaseRef]) pElectron->mvaBit     |=  baconhep::kEleMVATrightBit;
+    pElectron->mva        =  (*hMVAValuesMap)[eleBaseRef];
+    pElectron->mvaCat     =  (*hMVACatsMap)[eleBaseRef];
+    pElectron->isConv     = !itEle->passConversionVeto();
+
 
     if(gsfTrack.isNonnull()) {
       pElectron->nMissingHits = gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);

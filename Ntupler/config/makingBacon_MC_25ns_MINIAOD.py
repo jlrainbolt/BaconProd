@@ -118,13 +118,23 @@ if is_data_flag:
   process.AK8QGTaggerSubJetsCHS.jec  = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
   process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
-# produce photon isolation with proper footprint removal
-process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
 switchOnVIDPhotonIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.mvaPhotonID_Spring15_25ns_nonTrig_V2p1_cff']
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDPhotonSelection)
+
+process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
+process.load("RecoEgamma.ElectronIdentification.ElectronMVAValueMapProducer_cfi")
+process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
+switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
+my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff'
+                 ]
+for idmod in my_id_modules:
+   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
@@ -173,9 +183,10 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
+                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
+                            fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/0A341391-FFD5-E611-9BB7-0CC47A78A3E8.root')
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -259,6 +270,10 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     usePuppi                  = cms.untracked.bool(True),
     edmEcalPFClusterIsoMapTag = cms.untracked.InputTag('electronEcalPFClusterIsolationProducer'),
     edmHcalPFClusterIsoMapTag = cms.untracked.InputTag('electronHcalPFClusterIsolationProducer'),
+    edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90'),
+    edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80'),
+    edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
+    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories')
   ),
   
   Muon = cms.untracked.PSet(

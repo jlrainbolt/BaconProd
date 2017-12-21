@@ -86,6 +86,10 @@ namespace baconhep
       // PF cluster isolation info (not in AOD)
       edm::InputTag fEcalPFClusterIsoMapTag;
       edm::InputTag fHcalPFClusterIsoMapTag;
+      edm::InputTag fEleMediumIdMapTag;
+      edm::InputTag fEleTightIdMapTag;
+      edm::InputTag fMVAValuesMapTag;
+      edm::InputTag fMVACatsMapTag;
 
       bool fUseAOD;
       edm::EDGetTokenT<reco::GsfElectronCollection>  fTokEleName;
@@ -101,6 +105,10 @@ namespace baconhep
       edm::EDGetTokenT<reco::SuperClusterCollection> fTokSCName;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokEcalPFClusterIsoMap;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokHcalPFClusterIsoMap;
+      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleMediumIdMap;
+      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleTightIdMap;
+      edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAValuesMap;
+      edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVACatsMap;
   };
 }
 #endif
