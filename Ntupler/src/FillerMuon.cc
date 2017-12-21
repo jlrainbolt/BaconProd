@@ -123,6 +123,7 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->phi    = itMu->muonBestTrack()->phi();
     pMuon->ptErr  = itMu->muonBestTrack()->ptError();
     pMuon->q      = itMu->muonBestTrack()->charge();
+    pMuon->btt    = itMu->muonBestTrackType();
     pMuon->staPt  = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->pt()  : 0;
     pMuon->staEta = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->eta() : 0;
     pMuon->staPhi = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->phi() : 0;   
@@ -400,6 +401,7 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->phi    = itMu->muonBestTrack()->phi();
     pMuon->ptErr  = itMu->muonBestTrack()->ptError();
     pMuon->q      = itMu->muonBestTrack()->charge();
+    pMuon->btt    = itMu->muonBestTrackType();
     pMuon->staPt  = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->pt()  : 0;
     pMuon->staEta = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->eta() : 0;
     pMuon->staPhi = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->phi() : 0;
