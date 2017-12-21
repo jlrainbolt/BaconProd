@@ -277,6 +277,21 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
       
       unsigned int index;
 
+      index = metFilterNames.triggerIndex("Flag_badMuons");
+      if(index < hMETFilters->size()) {  // check for valid index
+        evtInfo->badMuonsFlag = hMETFilters->accept(index);
+      }
+
+      index = metFilterNames.triggerIndex("Flag_duplicateMuons");
+      if(index < hMETFilters->size()) {  // check for valid index
+        evtInfo->duplicateMuonsFlag = hMETFilters->accept(index);
+      }
+
+      index = metFilterNames.triggerIndex("Flag_noBadMuons");
+      if(index < hMETFilters->size()) {  // check for valid index
+        evtInfo->noBadMuonsFlag = hMETFilters->accept(index);
+      }
+
       // beam halo filter using CSCs
       index = metFilterNames.triggerIndex("Flag_CSCTightHalo2015Filter");
       if(index < hMETFilters->size()) {  // check for valid index
