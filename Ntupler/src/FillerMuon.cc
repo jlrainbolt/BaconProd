@@ -12,6 +12,7 @@
 #include "RecoVertex/KalmanVertexFit/interface/SimpleVertexTree.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 #include <TClonesArray.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -535,18 +536,24 @@ void FillerMuon::fill(TClonesArray *array,
 
         KalmanVertexFitter fitter;
         TransientVertex myVertex = fitter.vertex(t_tks);
-        savedVertex->index1 = pMuon->muIndex;
-        savedVertex->index2 = pMuon2->muIndex;
-        savedVertex->isValid = myVertex.isValid();
-        savedVertex->chi2 = myVertex.totalChiSquared();
-        savedVertex->ndof = myVertex.degreesOfFreedom();
         if (myVertex.isValid()) {
-        savedVertex->x = myVertex.position().x();
-        savedVertex->y = myVertex.position().y();
-        savedVertex->z = myVertex.position().z();
-        savedVertex->xerr = myVertex.positionError().cxx();
-        savedVertex->yerr = myVertex.positionError().cyy();
-        savedVertex->zerr = myVertex.positionError().czz();
+            savedVertex->index1 = pMuon->muIndex;
+            savedVertex->index2 = pMuon2->muIndex;
+            savedVertex->isValid = myVertex.isValid();
+            savedVertex->chi2 = myVertex.totalChiSquared();
+            savedVertex->ndof = myVertex.degreesOfFreedom();
+            savedVertex->x = myVertex.position().x();
+            savedVertex->y = myVertex.position().y();
+            savedVertex->z = myVertex.position().z();
+            savedVertex->xerr = myVertex.positionError().cxx();
+            savedVertex->yerr = myVertex.positionError().cyy();
+            savedVertex->zerr = myVertex.positionError().czz();
+            // New stuff
+            VertexDistanceXY vdistXY;
+            Measurement1D distXY = vdistXY.distance(myVertex, pv);
+            savedVertex->prob = ChiSquaredProbability(myVertex.totalChiSquared(), myVertex.degreesOfFreedom());
+            savedVertex->rxy = distXY.value();
+            savedVertex->rxy_err = distXY.error();
         }
     delete pMuon2;
     }
