@@ -394,7 +394,7 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->eta        = itEle->eta();
     pElectron->phi        = itEle->phi();
     pElectron->q          = itEle->charge();
-    pElectron->isCC       = itEle->isGsfCtfChargeConsistent();
+    pElectron->isCC       = itEle->isGsfCtfScPixChargeConsistent();
     pElectron->ecalEnergy = itEle->ecalEnergy();
     pElectron->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
     pElectron->scEta      = sc->eta();
