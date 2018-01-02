@@ -444,6 +444,9 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->d0    = (-1)*(itMu->muonBestTrack()->dxy(pv.position()));  // note: d0 = -dxy
     pMuon->dz    = itMu->muonBestTrack()->dz(pv.position());
     pMuon->sip3d = (itMu->edB(pat::Muon::PV3D) > 0) ? itMu->dB(pat::Muon::PV3D)/itMu->edB(pat::Muon::PV3D) : -999;
+    pMuon->x     = itMu->muonBestTrack()->vx();
+    pMuon->y     = itMu->muonBestTrack()->vy();
+    pMuon->z     = itMu->muonBestTrack()->vz();
 
     const reco::TransientTrack &tt = transientTrackBuilder->build(itMu->muonBestTrack());
 

@@ -457,6 +457,9 @@ void FillerElectron::fill(TClonesArray *array,
       pElectron->d0    = (-1)*(gsfTrack->dxy(pv.position()));  // note: d0 = -dxy
       pElectron->dz    = gsfTrack->dz(pv.position());
       pElectron->sip3d = (itEle->edB(pat::Electron::PV3D) > 0) ? itEle->dB(pat::Electron::PV3D)/itEle->edB(pat::Electron::PV3D) : -999;
+      pElectron->x     = gsfTrack->vx();
+      pElectron->y     = gsfTrack->vy();
+      pElectron->z     = gsfTrack->vz();
     }
 
 
