@@ -11,9 +11,9 @@ do_alpaca     = False
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
-  process.GlobalTag.globaltag = cms.string('80X_dataRun2_2016SeptRepro_v6')
+  process.GlobalTag.globaltag = cms.string('80X_dataRun2_2016SeptRepro_v7')
 else:
-  process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_TrancheIV_v7')
+  process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_TrancheIV_v8')
 
 #JEC
 JECTag='Summer16_23Sep2016V4_MC'
@@ -118,6 +118,7 @@ if is_data_flag:
   process.AK8QGTaggerSubJetsCHS.jec  = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
   process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
+# produce photon isolation with proper footprint removal
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
 switchOnVIDPhotonIdProducer(process, DataFormat.MiniAOD)
@@ -183,7 +184,7 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
                             fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/0A341391-FFD5-E611-9BB7-0CC47A78A3E8.root')
@@ -236,6 +237,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive            = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
     edmGenEventInfoName = cms.untracked.string('generator'),
     edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
+    edmGenPackParticlesName = cms.untracked.string('packedGenParticles'),
     fillAllGen          = cms.untracked.bool(False),
     fillLHEWeights      = cms.untracked.bool(True)
   ),
@@ -573,6 +575,7 @@ process.baconSequence = cms.Sequence(
                                      process.pfNoPileUpJME            *
                                      process.electronMVAValueMapProducer *
                                      process.egmGsfElectronIDs        *
+                                     #process.egmGsfElectronIDSequence *
                                      process.egmPhotonIDSequence      *
                                      process.puppiMETSequence         *
                                      process.genjetsequence           *
