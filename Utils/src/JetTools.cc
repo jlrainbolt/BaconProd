@@ -493,6 +493,43 @@ double JetTools::jetD0(const pat::Jet &jet, const reco::Vertex &pv)
 
   return d0;
 }
+math::XYZPoint JetTools::jetPosition(const pat::Jet &jet)
+{
+    std::vector<reco::Candidate const *> constituents;
+    for (unsigned int ida=0; ida<jet.numberOfDaughters(); ida++) {
+        reco::Candidate const *cand = jet.daughter(ida);
+        if (cand->numberOfDaughters()==0) { // AK8 jets in MINIAOD are SUBJETS
+            constituents.emplace_back(cand);
+        }
+        else {
+            for (unsigned int jda=0; jda<cand->numberOfDaughters(); jda++) {
+                reco::Candidate const *cand2 = cand->daughter(jda);
+                constituents.emplace_back(cand2);
+            }
+        }
+    }
+    std::sort(constituents.begin(), constituents.end(), [] (reco::Candidate const *ida, reco::Candidate const *jda) { return ida->pt() > jda->pt(); } );
+
+    // Assumes constituents are stored by descending pT
+    double x = -999;
+    double y = -999;
+    double z = -999;
+    math::XYZPoint outPoint;
+    outPoint.SetXYZ(x, y, z);
+    const unsigned int nPFCands = constituents.size();
+    for (unsigned int ipf=0; ipf<nPFCands; ipf++) {
+        const pat::PackedCandidate &pfcand = dynamic_cast<const pat::PackedCandidate &>(*constituents[ipf]);
+        if(pfcand.charge()==0) continue;
+        x = pfcand.vx();
+        y = pfcand.vy();
+        z = pfcand.vz();
+        outPoint.SetXYZ(x, y, z);
+        break;
+    }
+
+    return outPoint;
+}
+
 
 //--------------------------------------------------------------------------------------------------
 double JetTools::jetWidth(const reco::PFJet &jet, const int varType, const int pfType)

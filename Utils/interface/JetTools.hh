@@ -48,6 +48,9 @@ namespace baconhep {
       // d0 of the leading charged constituent in the jet
       static double jetD0(const reco::PFJet &jet, const reco::Vertex &pv);
       static double jetD0(const pat::Jet    &jet, const reco::Vertex &pv);
+
+      // position of the leading charged constituent in the jet
+      static math::XYZPoint jetPosition(const pat::Jet &jet);
       
       // jet width variables
       static double jetWidth(const reco::PFJet  &jet, const int varType=0, const int pfType=-1);

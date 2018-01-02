@@ -541,6 +541,9 @@ void FillerJet::fill(TClonesArray *array, TClonesArray *iExtraArray,
     //==============================
     pJet->d0 = JetTools::jetD0(*itJet, pv);
     pJet->dz = JetTools::jetDz(*itJet, pv);
+    pJet->x  = JetTools::jetPosition(*itJet).x();
+    pJet->y  = JetTools::jetPosition(*itJet).y();
+    pJet->z  = JetTools::jetPosition(*itJet).z();
 
     //
     // Identification
