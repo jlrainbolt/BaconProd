@@ -39,6 +39,7 @@ FillerMuon::FillerMuon(const edm::ParameterSet &iConfig, const bool useAOD,edm::
   fPuppiName     (iConfig.getUntrackedParameter<std::string>("edmPuppiName","puppi")),
   fPuppiNoLepName(iConfig.getUntrackedParameter<std::string>("edmPuppiNoLepName","puppiNoLep")),
   fUsePuppi      (iConfig.getUntrackedParameter<bool>("usePuppi",true)),
+  fFillVertices  (iConfig.getUntrackedParameter<bool>("fillVertices",false)),
   fUseAOD        (useAOD)
 {
   if(fUseAOD)  fTokMuonName       = iC.consumes<reco::MuonCollection>       (fMuonName);
@@ -509,6 +510,7 @@ void FillerMuon::fill(TClonesArray *array,
 
     pMuon->hltMatchBits = TriggerTools::matchHLT(pMuon->eta, pMuon->phi, triggerRecords, triggerObjects);
     
+    if (!fFillVertices) continue;
     // Loop over other muons and fit dimuon vertices
     if(itMu == muonCol->end()) continue;
     for(pat::MuonCollection::const_iterator itMu2 = itMu; itMu2!=muonCol->end(); ++itMu2) {

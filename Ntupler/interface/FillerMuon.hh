@@ -77,6 +77,7 @@ namespace baconhep
       std::string fPuppiName; 
       std::string fPuppiNoLepName; 
       bool fUsePuppi;
+      bool fFillVertices;
       bool fUseAOD;
       edm::EDGetTokenT<reco::MuonCollection>         fTokMuonName;
       edm::EDGetTokenT<pat::MuonCollection>          fTokPatMuonName;

@@ -115,7 +115,9 @@ class NtuplerMod : public edm::EDAnalyzer {
     bool fIsActiveGenFatJet;
     bool fIsActivePV;
     bool fIsActiveEle;
+    bool fFillVerticesEle;
     bool fIsActiveMuon;
+    bool fFillVerticesMuon;
     bool fIsActivePhoton;
     bool fIsActiveTau;
     bool fIsActiveCaloJet;

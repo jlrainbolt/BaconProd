@@ -100,7 +100,9 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
   fIsActiveGenFatJet (false),
   fIsActivePV        (false),
   fIsActiveEle       (false),
+  fFillVerticesEle   (false),
   fIsActiveMuon      (false),
+  fFillVerticesMuon  (false),
   fIsActivePhoton    (false),
   fIsActiveTau       (false),
   fIsActiveJet       (false),
@@ -219,6 +221,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
   if(iConfig.existsAs<edm::ParameterSet>("Electron",false)) {
     edm::ParameterSet cfg(iConfig.getUntrackedParameter<edm::ParameterSet>("Electron"));
     fIsActiveEle = cfg.getUntrackedParameter<bool>("isActive");
+    fFillVerticesEle = cfg.getUntrackedParameter<bool>("fillVertices");
     if(fIsActiveEle) {
       fEleArr    = new TClonesArray("baconhep::TElectron");    assert(fEleArr);
       fdielectronArr  = new TClonesArray("baconhep::TVertex");  assert(fdielectronArr);
@@ -229,6 +232,7 @@ NtuplerMod::NtuplerMod(const edm::ParameterSet &iConfig):
   if(iConfig.existsAs<edm::ParameterSet>("Muon",false)) {
     edm::ParameterSet cfg(iConfig.getUntrackedParameter<edm::ParameterSet>("Muon"));
     fIsActiveMuon = cfg.getUntrackedParameter<bool>("isActive");
+    fFillVerticesMuon = cfg.getUntrackedParameter<bool>("fillVertices");
     if(fIsActiveMuon) {
       fMuonArr    = new TClonesArray("baconhep::TMuon");    assert(fMuonArr);
       fdimuonArr  = new TClonesArray("baconhep::TVertex");  assert(fdimuonArr);
@@ -450,11 +454,13 @@ void NtuplerMod::beginJob()
   if(fIsActiveGenFatJet) { fEventTree->Branch("GenFatJet"  ,&fGenFatJetArr);}
   if(fIsActiveEle)    { 
       fEventTree->Branch("Electron", &fEleArr); 
-      fEventTree->Branch("DielectronVertex", &fdielectronArr);
+      if (fFillVerticesEle)
+          fEventTree->Branch("DielectronVertex", &fdielectronArr);
   }
   if(fIsActiveMuon) { 
       fEventTree->Branch("Muon", &fMuonArr);
-      fEventTree->Branch("DimuonVertex", &fdimuonArr);
+      if (fFillVerticesMuon)
+          fEventTree->Branch("DimuonVertex", &fdimuonArr);
   }
   if(fIsActiveTau)    { fEventTree->Branch("Tau",      &fTauArr); }
   if(fIsActivePhoton) { fEventTree->Branch("Photon",   &fPhotonArr); }

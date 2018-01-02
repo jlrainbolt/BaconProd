@@ -275,7 +275,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90'),
     edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80'),
     edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
-    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories')
+    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories'),
+    fillVertices              = cms.untracked.bool(False)
   ),
   
   Muon = cms.untracked.PSet(
@@ -285,7 +286,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #puppi
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
-    usePuppi                  = cms.untracked.bool(True)    
+    usePuppi                  = cms.untracked.bool(True),
+    fillVertices              = cms.untracked.bool(False)
   ),
   
   Photon = cms.untracked.PSet(

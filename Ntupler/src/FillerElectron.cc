@@ -47,6 +47,7 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fEleTightIdMapTag      (iConfig.getUntrackedParameter<edm::InputTag>("edmEleTightIdMapTag")),
   fMVAValuesMapTag       (iConfig.getUntrackedParameter<edm::InputTag>("edmMVAValuesTag")),
   fMVACatsMapTag         (iConfig.getUntrackedParameter<edm::InputTag>("edmMVACatsTag")),
+  fFillVertices          (iConfig.getUntrackedParameter<bool>("fillVertices",false)),
   fUseAOD                (useAOD)
 {
   if(fUseAOD)  fTokEleName        = iC.consumes<reco::GsfElectronCollection>(fEleName);
@@ -524,6 +525,7 @@ void FillerElectron::fill(TClonesArray *array,
 
     pElectron->hltMatchBits = TriggerTools::matchHLT(pElectron->eta, pElectron->phi, triggerRecords, triggerObjects);
 
+    if (!fFillVertices) continue;
     // Loop over other electrons and fit dielectron vertices
     if(itEle == eleCol->end()) continue;
     for(pat::ElectronCollection::const_iterator itEle2 = itEle; itEle2!=eleCol->end(); ++itEle2) {

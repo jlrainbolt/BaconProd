@@ -82,7 +82,7 @@ namespace baconhep
       std::string fPuppiName; 
       std::string fPuppiNoLepName; 
       bool fUsePuppi;
-
+      
       // PF cluster isolation info (not in AOD)
       edm::InputTag fEcalPFClusterIsoMapTag;
       edm::InputTag fHcalPFClusterIsoMapTag;
@@ -91,7 +91,6 @@ namespace baconhep
       edm::InputTag fMVAValuesMapTag;
       edm::InputTag fMVACatsMapTag;
 
-      bool fUseAOD;
       edm::EDGetTokenT<reco::GsfElectronCollection>  fTokEleName;
       edm::EDGetTokenT<pat::ElectronCollection>      fTokPatEleName;
       edm::EDGetTokenT<reco::BeamSpot>               fTokBSName;
@@ -109,6 +108,8 @@ namespace baconhep
       edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleTightIdMap;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAValuesMap;
       edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVACatsMap;
+      bool fFillVertices;
+      bool fUseAOD;
   };
 }
 #endif
