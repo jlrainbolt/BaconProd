@@ -47,6 +47,9 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fEleTightIdMapTag      (iConfig.getUntrackedParameter<edm::InputTag>("edmEleTightIdMapTag")),
   fMVAValuesMapTag       (iConfig.getUntrackedParameter<edm::InputTag>("edmMVAValuesTag")),
   fMVACatsMapTag         (iConfig.getUntrackedParameter<edm::InputTag>("edmMVACatsTag")),
+  fEleHZZIdMapTag      (iConfig.getUntrackedParameter<edm::InputTag>("edmEleHZZIdMapTag")),
+  fMVAHZZValuesMapTag       (iConfig.getUntrackedParameter<edm::InputTag>("edmMVAHZZValuesTag")),
+  fMVAHZZCatsMapTag         (iConfig.getUntrackedParameter<edm::InputTag>("edmMVAHZZCatsTag")),
   fFillVertices          (iConfig.getUntrackedParameter<bool>("fillVertices",false)),
   fUseAOD                (useAOD)
 {
@@ -67,6 +70,9 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fTokEleTightIdMap       = iC.consumes<edm::ValueMap<bool>  >(fEleTightIdMapTag);  
   fTokEleMVAValuesMap     = iC.consumes<edm::ValueMap<float> >(fMVAValuesMapTag);  
   fTokEleMVACatsMap       = iC.consumes<edm::ValueMap<int>   >(fMVACatsMapTag);  
+  fTokEleHZZIdMap       = iC.consumes<edm::ValueMap<bool>  >(fEleHZZIdMapTag);  
+  fTokEleMVAHZZValuesMap     = iC.consumes<edm::ValueMap<float> >(fMVAHZZValuesMapTag);  
+  fTokEleMVAHZZCatsMap       = iC.consumes<edm::ValueMap<int>   >(fMVAHZZCatsMapTag);  
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -345,6 +351,18 @@ void FillerElectron::fill(TClonesArray *array,
   edm::Handle<edm::ValueMap<int> > hMVACatsMap;
   iEvent.getByToken(fTokEleMVACatsMap,hMVACatsMap);
   assert(hMVACatsMap.isValid());
+  
+  edm::Handle<edm::ValueMap<bool> > hEleHZZIdMap;
+  iEvent.getByToken(fTokEleHZZIdMap,hEleHZZIdMap);
+  assert(hEleHZZIdMap.isValid());
+
+  edm::Handle<edm::ValueMap<float> > hMVAHZZValuesMap;
+  iEvent.getByToken(fTokEleMVAHZZValuesMap,hMVAHZZValuesMap);
+  assert(hMVAHZZValuesMap.isValid());
+
+  edm::Handle<edm::ValueMap<int> > hMVAHZZCatsMap;
+  iEvent.getByToken(fTokEleMVAHZZCatsMap,hMVAHZZCatsMap);
+  assert(hMVAHZZCatsMap.isValid());
 
   const pat::PackedCandidateCollection *pfPuppi      = 0;
   const pat::PackedCandidateCollection *pfPuppiNoLep = 0;
@@ -481,11 +499,16 @@ void FillerElectron::fill(TClonesArray *array,
 
     pElectron->mvaBit     = 0; 
     if((*hEleMediumIdMap)[eleBaseRef]) pElectron->mvaBit     |=  baconhep::kEleMVAMedBit;
-    if((*hEleTightIdMap) [eleBaseRef]) pElectron->mvaBit     |=  baconhep::kEleMVATrightBit;
+    if((*hEleTightIdMap) [eleBaseRef]) pElectron->mvaBit     |=  baconhep::kEleMVATightBit;
     pElectron->mva        =  (*hMVAValuesMap)[eleBaseRef];
     pElectron->mvaCat     =  (*hMVACatsMap)[eleBaseRef];
+    
+    pElectron->mvaHZZBit     = 0; 
+    if((*hEleHZZIdMap)[eleBaseRef]) pElectron->mvaHZZBit     |=  baconhep::kEleMVAHZZBit;
+    pElectron->mvaHZZ        =  (*hMVAHZZValuesMap)[eleBaseRef];
+    pElectron->mvaHZZCat     =  (*hMVAHZZCatsMap)[eleBaseRef];
+    
     pElectron->isConv     = !itEle->passConversionVeto();
-
 
     if(gsfTrack.isNonnull()) {
       pElectron->nMissingHits = gsfTrack->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);

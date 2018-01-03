@@ -132,7 +132,8 @@ process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff',
                  'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff'
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',
+                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff'
                  ]
 for idmod in my_id_modules:
    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
@@ -276,7 +277,10 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80'),
     edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
     edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories'),
-    fillVertices              = cms.untracked.bool(False)
+    edmEleHZZIdMapTag         = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose'),
+    edmMVAHZZValuesTag        = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Values'),
+    edmMVAHZZCatsTag          = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Categories'),
+    fillVertices              = cms.untracked.bool(True)
   ),
   
   Muon = cms.untracked.PSet(
@@ -287,7 +291,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),    
-    fillVertices              = cms.untracked.bool(False)
+    fillVertices              = cms.untracked.bool(True)
   ),
   
   Photon = cms.untracked.PSet(

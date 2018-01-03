@@ -90,6 +90,9 @@ namespace baconhep
       edm::InputTag fEleTightIdMapTag;
       edm::InputTag fMVAValuesMapTag;
       edm::InputTag fMVACatsMapTag;
+      edm::InputTag fEleHZZIdMapTag;
+      edm::InputTag fMVAHZZValuesMapTag;
+      edm::InputTag fMVAHZZCatsMapTag;
 
       edm::EDGetTokenT<reco::GsfElectronCollection>  fTokEleName;
       edm::EDGetTokenT<pat::ElectronCollection>      fTokPatEleName;
@@ -108,6 +111,9 @@ namespace baconhep
       edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleTightIdMap;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAValuesMap;
       edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVACatsMap;
+      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleHZZIdMap;
+      edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAHZZValuesMap;
+      edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVAHZZCatsMap;
       bool fFillVertices;
       bool fUseAOD;
   };
