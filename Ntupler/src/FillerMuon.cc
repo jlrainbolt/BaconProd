@@ -529,9 +529,6 @@ void FillerMuon::fill(TClonesArray *array,
         copy_p4(pMuon, MUON_MASS, muon1P4);
         copy_p4(pMuon2, MUON_MASS, muon2P4);
         TLorentzVector dimuon = muon1P4 + muon2P4;
-        float mDimuon = dimuon.M();
-        if (!(((2.0 < mDimuon) && (mDimuon < 4.0)) || ((75.0 < mDimuon) && (mDimuon < 107.0))))
-            continue; 
         TClonesArray &rArray2 = *array2;
         assert(rArray2.GetEntries() < rArray2.GetSize());
         const int index2 = rArray2.GetEntries();

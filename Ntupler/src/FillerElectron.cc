@@ -570,11 +570,7 @@ void FillerElectron::fill(TClonesArray *array,
         TLorentzVector elec1P4, elec2P4;
         copy_p4(pElectron, ELE_MASS, elec1P4);
         copy_p4(pElectron2, ELE_MASS, elec2P4);
-        TLorentzVector dielec = elec1P4 + elec2P4;
-        float mDielec = dielec.M();
-        if (!(((2.0 < mDielec) && (mDielec < 4.0)) || ((75.0 < mDielec) && (mDielec < 107.0))))
-            continue;
-        
+        TLorentzVector dielec = elec1P4 + elec2P4; 
         TClonesArray &rArray2 = *array2;
         assert(rArray2.GetEntries() < rArray2.GetSize());
         const int index2 = rArray2.GetEntries();
