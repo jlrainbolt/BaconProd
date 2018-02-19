@@ -422,7 +422,12 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->gammaIso  = itMu->pfIsolationR04().sumPhotonEt;
     pMuon->neuHadIso = itMu->pfIsolationR04().sumNeutralHadronEt;
     pMuon->puIso     = itMu->pfIsolationR04().sumPUPt;
-
+    
+    pMuon->chHadIso03  = itMu->pfIsolationR03().sumChargedHadronPt;
+    pMuon->gammaIso03  = itMu->pfIsolationR03().sumPhotonEt;
+    pMuon->neuHadIso03 = itMu->pfIsolationR03().sumNeutralHadronEt;
+    pMuon->puIso03     = itMu->pfIsolationR03().sumPUPt;
+    
     if(fUsePuppi) { 
       double pEta = pMuon->pfEta;
       double pPhi = pMuon->pfPhi;
@@ -530,7 +535,7 @@ void FillerMuon::fill(TClonesArray *array,
         copy_p4(pMuon2, MUON_MASS, muon2P4);
         TLorentzVector dimuon = muon1P4 + muon2P4;
         TClonesArray &rArray2 = *array2;
-        assert(rArray2.GetEntries() < rArray2.GetSize());
+        //assert(rArray2.GetEntries() < rArray2.GetSize());
         const int index2 = rArray2.GetEntries();
         new(rArray2[index2]) baconhep::TVertex();
         baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
