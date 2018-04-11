@@ -36,20 +36,40 @@ const reco::Vertex* FillerVertex::fill(TClonesArray *array, int &nvtx, const edm
   const reco::Vertex* pv = &(*pvCol->begin());
   nvtx = 0;
     
-  for(reco::VertexCollection::const_iterator itVtx = pvCol->begin(); itVtx!=pvCol->end(); ++itVtx) {    
+  for(reco::VertexCollection::const_iterator itVtx = pvCol->begin(); itVtx!=pvCol->end(); ++itVtx) { 
+    //std::cout << "processing new vertex" << std::endl;
     if(fUseAOD) {
       if(itVtx->isFake())                        continue;
     } else {
       if(itVtx->chi2()==0 && itVtx->ndof()==0)   continue;  //(!) substitute for Vertex::isFake() because track collection not in MINIAOD
     }
-    if(itVtx->tracksSize()     < fMinNTracksFit) continue;
-    if(itVtx->ndof()           < fMinNdof)       continue;
-    if(fabs(itVtx->z())        > fMaxAbsZ)       continue;
-    if(itVtx->position().Rho() > fMaxRho)        continue;
+    if(itVtx->tracksSize()     < fMinNTracksFit) {
+        //std::cout << "cut vertex at " << itVtx->x() << ", " << itVtx->y() << ", " << itVtx->z() << std::endl;
+        continue;
+    }
+    //std::cout << "passed track size cut" << std::endl;
+    if(itVtx->ndof()           < fMinNdof) {
+        //std::cout << "cut vertex at " << itVtx->x() << ", " << itVtx->y() << ", " << itVtx->z() << std::endl;
+        //std::cout << "cut ndof value was " << itVtx->ndof() << std::endl;
+        continue;
+    }
+    //std::cout << "passed ndof cut" << std::endl;
+    if(fabs(itVtx->z())        > fMaxAbsZ) {
+        //std::cout << "cut vertex at " << itVtx->x() << ", " << itVtx->y() << ", " << itVtx->z() << std::endl;
+        continue;
+    }
+    //std::cout << "passed z cut" << std::endl;
+    if(itVtx->position().Rho() > fMaxRho) {
+        //std::cout << "cut vertex at " << itVtx->x() << ", " << itVtx->y() << ", " << itVtx->z() << std::endl;
+        continue;
+    }
+    //std::cout << "passed rho cut" << std::endl;
+    //std::cout << "passed vertex at " << itVtx->x() << ", " << itVtx->y() << ", " << itVtx->z() << std::endl;
 
     // vertices are sorted by sum{pT^2}, so the first one passing cuts
     // is taken as the event primary vertex
     if(nvtx==0) {
+      //std::cout << "THIS VERTEX IS THE CHOSEN ONE" << std::endl;
       pv = &(*itVtx);
     }
     nvtx++;

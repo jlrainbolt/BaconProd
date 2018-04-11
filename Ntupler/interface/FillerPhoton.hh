@@ -65,6 +65,7 @@ namespace baconhep
       
       // EDM object collection names
       std::string fPhotonName;
+      std::string fCalibPhotonName;
       std::string fPFCandName;
       std::string fBSName;
       std::string fEleName;
@@ -72,7 +73,9 @@ namespace baconhep
       edm::InputTag fSCName;
 
       edm::EDGetTokenT<reco::PhotonCollection>       fTokPhotonName;
+      edm::EDGetTokenT<reco::PhotonCollection>       fCalibTokPhotonName;
       edm::EDGetTokenT<pat::PhotonCollection>        fTokPatPhotonName;
+      edm::EDGetTokenT<pat::PhotonCollection>        fCalibTokPatPhotonName;
       edm::EDGetTokenT<reco::PFCandidateCollection>  fTokPFCandName;
       edm::EDGetTokenT<reco::BeamSpot>               fTokBSName;
       edm::EDGetTokenT<reco::GsfElectronCollection>  fTokEleName;

@@ -26,6 +26,7 @@ using namespace baconhep;
 FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
   fMinPt             (iConfig.getUntrackedParameter<double>("minPt",10)),
   fPhotonName        (iConfig.getUntrackedParameter<std::string>("edmName","gedPhotons")),
+  fCalibPhotonName   (iConfig.getUntrackedParameter<std::string>("calibEdmName", "calibGedPhotons")),
   fPFCandName        (iConfig.getUntrackedParameter<std::string>("edmPFCandName","particleFlow")),
   fBSName            (iConfig.getUntrackedParameter<std::string>("edmBeamspotName","offlineBeamSpot")),
   fEleName           (iConfig.getUntrackedParameter<std::string>("edmElectronName","gedGsfElectrons")),
@@ -40,6 +41,8 @@ FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,e
 //  fPhotonMVA = new PhotonMVACalculator();
   if(fUseAOD)  fTokPhotonName    =  iC.consumes<reco::PhotonCollection>     (fPhotonName);
   if(!fUseAOD) fTokPatPhotonName =  iC.consumes<pat::PhotonCollection>      (fPhotonName);
+  if(fUseAOD)  fCalibTokPhotonName    =  iC.consumes<reco::PhotonCollection>     (fCalibPhotonName);
+  if(!fUseAOD) fCalibTokPatPhotonName =  iC.consumes<pat::PhotonCollection>      (fCalibPhotonName);
   fTokPFCandName =  iC.consumes<reco::PFCandidateCollection>(fPFCandName);
   fTokBSName     =  iC.consumes<reco::BeamSpot>             (fBSName);
   fTokEleName    =  iC.consumes<reco::GsfElectronCollection>(fEleName);
@@ -227,6 +230,12 @@ void FillerPhoton::fill(TClonesArray *array,
   assert(hPhotonProduct.isValid());
   const pat::PhotonCollection *photonCol = hPhotonProduct.product();
 
+  // Get calibrated photon collection
+  edm::Handle<pat::PhotonCollection> hCalibPhotonProduct;
+  iEvent.getByToken(fCalibTokPatPhotonName,hCalibPhotonProduct);
+  assert(hCalibPhotonProduct.isValid());
+  const pat::PhotonCollection *calibPhotonCol = hCalibPhotonProduct.product();
+
   // Get supercluster collection
   edm::Handle<reco::SuperClusterCollection> hSCProduct;
   iEvent.getByToken(fTokSCName,hSCProduct);
@@ -251,6 +260,16 @@ void FillerPhoton::fill(TClonesArray *array,
   assert(hPhoMVAMap.isValid());
 
   for(pat::PhotonCollection::const_iterator itPho = photonCol->begin(); itPho!=photonCol->end(); ++itPho) {
+
+      Float_t corrPt = -1;
+      Float_t corrEn = -1;
+
+      for (pat::PhotonCollection::const_iterator itCalibPho = calibPhotonCol->begin(); itCalibPho!=calibPhotonCol->end(); ++ itCalibPho) {
+          if (fabs(itPho->eta() - itCalibPho->eta()) < 0.001 && fabs(itPho->phi() - itCalibPho->phi()) < 0.001) {
+              corrPt = itCalibPho->pt();
+              corrEn = itCalibPho->energy();
+          }
+      }
 
     // Photon cuts
     if(itPho->pt() < fMinPt) continue;
@@ -279,6 +298,9 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->scEta = sc->eta();
     pPhoton->scPhi = sc->phi();
 
+    // Calibrated values
+    pPhoton->calibPt = corrPt;
+    pPhoton->calibE = corrEn;
 
     //
     // Isolation
@@ -337,6 +359,7 @@ void FillerPhoton::fill(TClonesArray *array,
 
     // Photon MVA ID: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariatePhotonIdentificationRun2
     pPhoton->mva = (*hPhoMVAMap)[phoBaseRef];//itPho->photonID("egmPhotonIDs:mvaPhoID-Spring15-25ns-nonTrig-V2-wp90");
+    std::cout << "pt, calib_pt, eta, phi, mva: " << pPhoton->pt << ", " << pPhoton->calibPt << ", " << pPhoton->eta << ", " << pPhoton->phi << ", " << pPhoton->mva << std::endl;
 
     pPhoton->hltMatchBits = TriggerTools::matchHLT(pPhoton->eta, pPhoton->phi, triggerRecords, triggerObjects);
   }
