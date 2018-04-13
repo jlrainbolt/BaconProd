@@ -73,6 +73,7 @@ namespace baconhep
       
       // EDM object collection names
       std::string fEleName;
+      std::string fCalibEleName;
       std::string fBSName;
       std::string fPFCandName;
       std::string fTrackName;
@@ -95,7 +96,9 @@ namespace baconhep
       edm::InputTag fMVAHZZCatsMapTag;
 
       edm::EDGetTokenT<reco::GsfElectronCollection>  fTokEleName;
+      edm::EDGetTokenT<reco::GsfElectronCollection>  fCalibTokEleName;
       edm::EDGetTokenT<pat::ElectronCollection>      fTokPatEleName;
+      edm::EDGetTokenT<pat::ElectronCollection>      fCalibTokPatEleName;
       edm::EDGetTokenT<reco::BeamSpot>               fTokBSName;
       edm::EDGetTokenT<reco::PFCandidateCollection>  fTokPFCandName;
       edm::EDGetTokenT<reco::PFCandidateCollection>  fTokPuppiName;

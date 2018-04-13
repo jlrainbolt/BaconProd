@@ -33,6 +33,7 @@ void copy_p4(const T* lhs, float mass, TLorentzVector& rhs) {
 FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
   fMinPt                 (iConfig.getUntrackedParameter<double>("minPt",7)),
   fEleName               (iConfig.getUntrackedParameter<std::string>("edmName","gedGsfElectrons")),
+  fCalibEleName               (iConfig.getUntrackedParameter<std::string>("calibEdmName","calibGedGsfElectrons")),
   fBSName                (iConfig.getUntrackedParameter<std::string>("edmBeamspotName","offlineBeamSpot")),
   fPFCandName            (iConfig.getUntrackedParameter<std::string>("edmPFCandName","particleFlow")),
   fTrackName             (iConfig.getUntrackedParameter<std::string>("edmTrackName","generalTracks")),
@@ -55,6 +56,8 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
 {
   if(fUseAOD)  fTokEleName        = iC.consumes<reco::GsfElectronCollection>(fEleName);
   if(!fUseAOD) fTokPatEleName     = iC.consumes<pat::ElectronCollection>(fEleName);
+  if(fUseAOD)  fCalibTokEleName        = iC.consumes<reco::GsfElectronCollection>(fCalibEleName);
+  if(!fUseAOD) fCalibTokPatEleName     = iC.consumes<pat::ElectronCollection>(fCalibEleName);
   fTokSCName         = iC.consumes<reco::SuperClusterCollection>(fSCName);
   fTokBSName         = iC.consumes<reco::BeamSpot>             (fBSName);
   fTokPFCandName     = iC.consumes<reco::PFCandidateCollection>(fPFCandName);
@@ -330,6 +333,12 @@ void FillerElectron::fill(TClonesArray *array,
   assert(hEleProduct.isValid());
   const pat::ElectronCollection *eleCol = hEleProduct.product();
 
+  // Get calibrated electron collection
+  edm::Handle<pat::ElectronCollection> hCalibEleProduct;
+  iEvent.getByToken(fCalibTokPatEleName,hCalibEleProduct);
+  assert(hCalibEleProduct.isValid());
+  const pat::ElectronCollection *calibEleCol = hCalibEleProduct.product();
+
   // Get supercluster collection
   edm::Handle<reco::SuperClusterCollection> hSCProduct;
   iEvent.getByToken(fTokSCName,hSCProduct);
@@ -387,6 +396,16 @@ void FillerElectron::fill(TClonesArray *array,
 
   for(pat::ElectronCollection::const_iterator itEle = eleCol->begin(); itEle!=eleCol->end(); ++itEle) {
 
+    Float_t corrPt = -1;
+    Float_t corrEn = -1;
+
+    for (pat::ElectronCollection::const_iterator itCalibEle = calibEleCol->begin(); itCalibEle!=calibEleCol->end(); ++ itCalibEle) {
+        if (fabs(itEle->eta() - itCalibEle->eta()) < 0.001 && fabs(itEle->phi() - itCalibEle->phi()) < 0.001) {
+            corrPt = itCalibEle->pt();
+            corrEn = itCalibEle->energy();
+        }
+    }
+
     const reco::GsfTrackRef gsfTrack = itEle->gsfTrack();
     const reco::SuperClusterRef sc   = itEle->superCluster();
     edm::RefToBase<reco::GsfElectron> eleBaseRef( edm::Ref<pat::ElectronCollection>(hEleProduct, itEle - eleCol->begin()) );
@@ -418,6 +437,10 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
     pElectron->scEta      = sc->eta();
     pElectron->scPhi      = sc->phi();
+
+    // Calibrated values
+    pElectron->calibPt = corrPt;
+    pElectron->calibE = corrEn;
 
     pElectron->pfPt  = 0;
     pElectron->pfEta = 0;
@@ -547,6 +570,9 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->trkID = -1;  // general tracks not in MINIAOD
 
     pElectron->hltMatchBits = TriggerTools::matchHLT(pElectron->eta, pElectron->phi, triggerRecords, triggerObjects);
+
+    
+    //std::cout << "pt, calib_pt, eta, phi: " << pElectron->pt << ", " << pElectron->calibPt << ", " << pElectron->eta << ", " << pElectron->phi << std::endl;
 
     if (!fFillVertices) continue;
     // Loop over other electrons and fit dielectron vertices

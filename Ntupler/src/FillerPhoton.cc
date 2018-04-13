@@ -359,7 +359,7 @@ void FillerPhoton::fill(TClonesArray *array,
 
     // Photon MVA ID: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariatePhotonIdentificationRun2
     pPhoton->mva = (*hPhoMVAMap)[phoBaseRef];//itPho->photonID("egmPhotonIDs:mvaPhoID-Spring15-25ns-nonTrig-V2-wp90");
-    std::cout << "pt, calib_pt, eta, phi, mva: " << pPhoton->pt << ", " << pPhoton->calibPt << ", " << pPhoton->eta << ", " << pPhoton->phi << ", " << pPhoton->mva << std::endl;
+    //std::cout << "pt, calib_pt, eta, phi, mva: " << pPhoton->pt << ", " << pPhoton->calibPt << ", " << pPhoton->eta << ", " << pPhoton->phi << ", " << pPhoton->mva << std::endl;
 
     pPhoton->hltMatchBits = TriggerTools::matchHLT(pPhoton->eta, pPhoton->phi, triggerRecords, triggerObjects);
   }

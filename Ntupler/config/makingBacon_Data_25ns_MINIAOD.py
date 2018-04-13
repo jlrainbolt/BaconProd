@@ -118,6 +118,26 @@ if is_data_flag:
   process.AK8QGTaggerSubJetsCHS.jec  = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
   process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
+### EGM 80X regression
+from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+process = regressionWeights(process)
+process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+                                                  calibratedPatElectrons = cms.PSet(
+    initialSeed = cms.untracked.uint32(12345),
+    engineName = cms.untracked.string('TRandom3')
+    ),
+                                                  calibratedPatPhotons = cms.PSet(
+    initialSeed = cms.untracked.uint32(12345),
+    engineName = cms.untracked.string('TRandom3')
+    )
+                                                   )
+
+process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
+process.load('EgammaAnalysis.ElectronTools.calibratedPatPhotonsRun2_cfi')
+process.calibratedPatElectrons.isMC = cms.bool(False)
+process.calibratedPatPhotons.isMC = cms.bool(False)
 # produce photon isolation with proper footprint removal
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
@@ -138,6 +158,11 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
                  ]
 for idmod in my_id_modules:
    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+
+#process.electronIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
+process.electronMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
+process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
+process.photonMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
 
 # PF MET corrections
 #from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
@@ -191,7 +216,8 @@ process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/data/Run2016F/SinglePhoton/MINIAOD/03Feb2017-v1/80000/EE72E7D2-98EA-E611-BA88-001E67F8F7E0.root')
                             #fileNames = cms.untracked.vstring('/store/data/Run2016C/DoubleEG/MINIAOD/03Feb2017-v1/80000/00371362-6AEC-E611-9845-842B2B758BAA.root')
                             #fileNames = cms.untracked.vstring('/store/data/Run2016E/DoubleMuon/MINIAOD/03Feb2017-v1/100000/62FA245B-6AEE-E611-B9CE-0025905B85B2.root')
-                            fileNames = cms.untracked.vstring('file:mva_test_event.root')
+                            #fileNames = cms.untracked.vstring('file:mva_test_event.root')
+                            fileNames = cms.untracked.vstring('file:pho_calib_test_data.root')
                             #fileNames = cms.untracked.vstring('/store/user/jbueghly/jbueghly_data_multicrab/DoubleMuon/crab_pickEvents/180302_144556/0000/pickevents_8.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
@@ -272,6 +298,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive                  = cms.untracked.bool(True),
     minPt                     = cms.untracked.double(7),
     edmName                   = cms.untracked.string('slimmedElectrons'),
+    calibEdmName              = cms.untracked.string('calibratedPatElectrons'),
     edmSCName                 = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
@@ -303,6 +330,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive              = cms.untracked.bool(True),
     minPt                 = cms.untracked.double(10),
     edmName               = cms.untracked.string('slimmedPhotons'),
+    calibEdmName          = cms.untracked.string('calibratedPatPhotons'),
     edmSCName             = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
     edmChHadIsoMapTag     = cms.untracked.InputTag("photonIDValueMapProducer:phoChargedIsolation"),        # EGM recommendation not in AOD/MINIAOD
     edmNeuHadIsoMapTag    = cms.untracked.InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"),  # EGM recommendation not in AOD/MINIAOD
@@ -578,6 +606,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
 process.baconSequence = cms.Sequence(
                                      #process.pfCleaned*
+                                     process.regressionApplication    *
                                      process.BadPFMuonFilter          *
                                      process.BadChargedCandidateFilter*
                                      process.ak4chsL1FastL2L3ResidualChain*
@@ -589,8 +618,10 @@ process.baconSequence = cms.Sequence(
                                      process.QGTagger                 *
                                      process.pfNoPileUpJME            *
                                      process.electronMVAValueMapProducer *
-                                     process.egmGsfElectronIDs        *
-                                     #process.egmGsfElectronIDSequence *
+                                     #process.egmGsfElectronIDs        *
+                                     process.calibratedPatElectrons   *
+                                     process.calibratedPatPhotons     *
+                                     process.egmGsfElectronIDSequence *
                                      process.egmPhotonIDSequence      *
                                      process.puppiMETSequence         *
                                      process.AK4jetsequencePuppiData  *

@@ -160,6 +160,11 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
    setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
+#process.electronIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
+process.electronMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
+process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
+process.photonMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
+
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD(process,
@@ -211,7 +216,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
                             #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/0A341391-FFD5-E611-9BB7-0CC47A78A3E8.root')
-                            fileNames = cms.untracked.vstring('file:pho_calib_test_event.root')
+                            #fileNames = cms.untracked.vstring('file:pho_calib_test_event.root')
+                            fileNames = cms.untracked.vstring('file:hzg_test_file.root')
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -219,7 +225,7 @@ process.source.inputCommands = cms.untracked.vstring("keep *",
 #--------------------------------------------------------------------------------
 # Reporting
 #================================================================================
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool(False),
   Rethrow     = cms.untracked.vstring('ProductNotFound'),
@@ -290,7 +296,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive                  = cms.untracked.bool(True),
     minPt                     = cms.untracked.double(7),
     edmName                   = cms.untracked.string('slimmedElectrons'),
-    calibEdmName              = cms.untracked.InputTag('calibratedPatElectrons'),
+    calibEdmName              = cms.untracked.string('calibratedPatElectrons'),
     edmSCName                 = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
@@ -322,7 +328,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive              = cms.untracked.bool(True),
     minPt                 = cms.untracked.double(10),
     edmName               = cms.untracked.string('slimmedPhotons'),
-    calibEdmName          = cms.untracked.InputTag('calibratedPatPhotons'),
+    calibEdmName          = cms.untracked.string('calibratedPatPhotons'),
     edmSCName             = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
     edmChHadIsoMapTag     = cms.untracked.InputTag("photonIDValueMapProducer:phoChargedIsolation"),        # EGM recommendation not in AOD/MINIAOD
     edmNeuHadIsoMapTag    = cms.untracked.InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"),  # EGM recommendation not in AOD/MINIAOD
@@ -597,6 +603,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 )
 process.baconSequence = cms.Sequence(
                                      #process.pfCleaned*
+                                     process.regressionApplication    *
                                      process.BadPFMuonFilter          *
                                      process.BadChargedCandidateFilter*
                                      process.ak4chsL1FastL2L3Chain    *
