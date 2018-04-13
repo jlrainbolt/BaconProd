@@ -3,6 +3,7 @@ BaconProd
 
 Package for producing bacon ntuples
 
+ * Run on CMS LPC
  * CMSSW_8_0_26_patch1
  * Depends on NWUHEP/BaconAna topic_jbueghly branch
 
@@ -16,6 +17,7 @@ cmsenv
 git cms-init
 git cms-merge-topic rafaellopesdesa:RegressionCheckNegEnergy
 git cms-merge-topic cms-egamma:EGM_gain_v1
+cd EgammaAnalysis/ElectronTools/data/
 git clone -b Moriond17_gainSwitch_unc https://github.com/ECALELFS/ScalesSmearings.git
 cd $CMSSW_BASE/src
 ```
@@ -32,7 +34,8 @@ git clone -b topic_jbueghly git@github.com:NWUHEP/BaconProd
 cp -r /uscms/home/jbueghly/nobackup/bacon/xmas_bacon_2017/CMSSW_8_0_26_patch1/src/ShowerDeconstruction/ .
 cp -r /uscms/home/jbueghly/nobackup/bacon/xmas_bacon_2017/CMSSW_8_0_26_patch1/src/RecoMET/METPUSubtraction/ RecoMET/
 cp -r /uscms/home/jbueghly/nobackup/bacon/xmas_bacon_2017/CMSSW_8_0_26_patch1/src/PhysicsTools .
-scram b 
+scram b clean
+scram b -j 12
 ```
 
 * to run, navigate to BaconProd/Ntupler/config
