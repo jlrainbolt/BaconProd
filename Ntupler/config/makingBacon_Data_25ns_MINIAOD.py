@@ -215,9 +215,9 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/data/Run2016F/SinglePhoton/MINIAOD/03Feb2017-v1/80000/EE72E7D2-98EA-E611-BA88-001E67F8F7E0.root')
                             #fileNames = cms.untracked.vstring('/store/data/Run2016C/DoubleEG/MINIAOD/03Feb2017-v1/80000/00371362-6AEC-E611-9845-842B2B758BAA.root')
-                            #fileNames = cms.untracked.vstring('/store/data/Run2016E/DoubleMuon/MINIAOD/03Feb2017-v1/100000/62FA245B-6AEE-E611-B9CE-0025905B85B2.root')
+                            fileNames = cms.untracked.vstring('/store/data/Run2016E/DoubleMuon/MINIAOD/03Feb2017-v1/100000/62FA245B-6AEE-E611-B9CE-0025905B85B2.root')
                             #fileNames = cms.untracked.vstring('file:mva_test_event.root')
-                            fileNames = cms.untracked.vstring('file:pho_calib_test_data.root')
+                            #fileNames = cms.untracked.vstring('file:pho_calib_test_data.root')
                             #fileNames = cms.untracked.vstring('/store/user/jbueghly/jbueghly_data_multicrab/DoubleMuon/crab_pickEvents/180302_144556/0000/pickevents_8.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
@@ -226,7 +226,7 @@ process.source.inputCommands = cms.untracked.vstring("keep *",
 #--------------------------------------------------------------------------------
 # Reporting
 #================================================================================
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool(False),
   Rethrow     = cms.untracked.vstring('ProductNotFound'),
