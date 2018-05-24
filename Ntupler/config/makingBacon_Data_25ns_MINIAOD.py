@@ -138,6 +138,7 @@ process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
 process.load('EgammaAnalysis.ElectronTools.calibratedPatPhotonsRun2_cfi')
 process.calibratedPatElectrons.isMC = cms.bool(False)
 process.calibratedPatPhotons.isMC = cms.bool(False)
+
 # produce photon isolation with proper footprint removal
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
@@ -165,32 +166,32 @@ process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
 process.photonMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
 
 # PF MET corrections
-#from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=is_data_flag,
-#                           manualJetConfig=True,
-#                           jetCorLabelL3="ak4chsL1FastL2L3Corrector",
-#                           jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
-#                           reclusterJets=True,
-#                           recoMetFromPFCs=True,
-#                           postfix="V2"
-#                           )
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+runMetCorAndUncFromMiniAOD(process,
+                           isData=is_data_flag,
+                           manualJetConfig=True,
+                           jetCorLabelL3="ak4chsL1FastL2L3Corrector",
+                           jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
+                           reclusterJets=True,
+                           recoMetFromPFCs=True,
+                           postfix="V2"
+                           )
 
 # PUPPI Woof Woof
 from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 makePuppiesFromMiniAOD (process, True )
-#runMetCorAndUncFromMiniAOD(process,
-#                           isData=is_data_flag,
-#                           manualJetConfig=True,
-#                           metType="Puppi",
-#                           pfCandColl=cms.InputTag("puppiForMET"),
-#                           recoMetFromPFCs=True,
-#                           jetFlavor="AK4PFPuppi",
-#                           jetCorLabelL3="ak4PuppiL1FastL2L3Corrector",
-#                           jetCorLabelRes="ak4PuppiL1FastL2L3ResidualCorrector",
-#                           reclusterJets=True,
-#                           postfix="Puppi"
-#                           )
+runMetCorAndUncFromMiniAOD(process,
+                           isData=is_data_flag,
+                           manualJetConfig=True,
+                           metType="Puppi",
+                           pfCandColl=cms.InputTag("puppiForMET"),
+                           recoMetFromPFCs=True,
+                           jetFlavor="AK4PFPuppi",
+                           jetCorLabelL3="ak4PuppiL1FastL2L3Corrector",
+                           jetCorLabelRes="ak4PuppiL1FastL2L3ResidualCorrector",
+                           reclusterJets=True,
+                           postfix="Puppi"
+                           )
 
 if is_data_flag:
   process.AK4QGTaggerPuppi.jec           = cms.InputTag("ak4PuppiL1FastL2L3ResidualCorrector")
@@ -211,13 +212,13 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/data/Run2016F/SinglePhoton/MINIAOD/03Feb2017-v1/80000/EE72E7D2-98EA-E611-BA88-001E67F8F7E0.root')
                             #fileNames = cms.untracked.vstring('/store/data/Run2016C/DoubleEG/MINIAOD/03Feb2017-v1/80000/00371362-6AEC-E611-9845-842B2B758BAA.root')
-                            fileNames = cms.untracked.vstring('/store/data/Run2016E/DoubleMuon/MINIAOD/03Feb2017-v1/100000/62FA245B-6AEE-E611-B9CE-0025905B85B2.root')
+                            #fileNames = cms.untracked.vstring('/store/data/Run2016E/DoubleMuon/MINIAOD/03Feb2017-v1/100000/62FA245B-6AEE-E611-B9CE-0025905B85B2.root')
                             #fileNames = cms.untracked.vstring('file:mva_test_event.root')
-                            #fileNames = cms.untracked.vstring('file:pho_calib_test_data.root')
+                            fileNames = cms.untracked.vstring('file:double_muon_file.root')
                             #fileNames = cms.untracked.vstring('/store/user/jbueghly/jbueghly_data_multicrab/DoubleMuon/crab_pickEvents/180302_144556/0000/pickevents_8.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
@@ -242,8 +243,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   TriggerObject     = cms.untracked.string("selectedPatTrigger"),
   TriggerFile       = cms.untracked.string(hlt_filename),
   useAOD            = cms.untracked.bool(False),
-  #outputName        = cms.untracked.string('Output.root'),
-  outputName        = cms.untracked.string('pickevents_out.root'),
+  outputName        = cms.untracked.string('Output.root'),
   edmPVName         = cms.untracked.string('offlineSlimmedPrimaryVertices'),
   edmGenRunInfoName = cms.untracked.string('generator'),
   
@@ -271,7 +271,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
     edmGenPackParticlesName = cms.untracked.string('packedGenParticles'),
     fillAllGen          = cms.untracked.bool(False),
-    fillLHEWeights      = cms.untracked.bool(True)
+    fillLHEWeights      = cms.untracked.bool(False)
   ),
 
   GenJet  = cms.untracked.PSet(
@@ -630,8 +630,8 @@ process.baconSequence = cms.Sequence(
                                      process.AK8jetsequencePuppiData  *
                                      process.CA15jetsequencePuppiData *
                                      process.btagging                 *
-                                     #process.fullPatMetSequenceV2     *
-                                     #process.fullPatMetSequencePuppi  *
+                                     process.fullPatMetSequenceV2     *
+                                     process.fullPatMetSequencePuppi  *
                                      process.ntupler)
 
 #--------------------------------------------------------------------------------

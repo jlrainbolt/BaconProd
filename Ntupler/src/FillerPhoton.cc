@@ -301,6 +301,14 @@ void FillerPhoton::fill(TClonesArray *array,
     // Calibrated values
     pPhoton->calibPt = corrPt;
     pPhoton->calibE = corrEn;
+    
+    pPhoton->eRes = itPho->getCorrectedEnergyError(itPho->getCandidateP4type())/itPho->getCorrectedEnergy(itPho->getCandidateP4type());
+
+    //float res_val;
+    //res_val = itPho->getCorrectedEnergyError(itPho->getCandidateP4type())/itPho->getCorrectedEnergy(itPho->getCandidateP4type());
+    //std::cout << "corrected energy for res = " << itPho->getCorrectedEnergy(itPho->getCandidateP4type()) << std::endl;
+    //std::cout << "nominal calibPt, calibE: " << corrPt << ", " << corrEn << std::endl;
+    //std::cout << "photon res = " << res_val << std::endl;
 
     //
     // Isolation

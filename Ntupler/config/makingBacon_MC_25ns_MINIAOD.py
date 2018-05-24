@@ -4,7 +4,7 @@ import os
 process = cms.Process('MakingBacon')
 
 is_data_flag  = False                                      # flag for if process data
-do_hlt_filter = False                                      # flag to skip events that fail relevant triggers
+do_hlt_filter = True                                      # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"   # list of relevant triggers
 do_alpaca     = False
 
@@ -212,12 +212,13 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
+                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
+                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/110000/005ED0EB-79F1-E611-B6DA-02163E011C2B.root')
                             #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/0A341391-FFD5-E611-9BB7-0CC47A78A3E8.root')
                             #fileNames = cms.untracked.vstring('file:pho_calib_test_event.root')
-                            #fileNames = cms.untracked.vstring('file:hzg_test_file.root')
+                            fileNames = cms.untracked.vstring('file:dy_mc_file.root')
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -268,8 +269,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmGenEventInfoName = cms.untracked.string('generator'),
     edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
     edmGenPackParticlesName = cms.untracked.string('packedGenParticles'),
-    fillAllGen          = cms.untracked.bool(False),
-    fillLHEWeights      = cms.untracked.bool(False)
+    fillAllGen          = cms.untracked.bool(True),
+    fillLHEWeights      = cms.untracked.bool(True)
   ),
 
   GenJet  = cms.untracked.PSet(
@@ -280,7 +281,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
     genJetName          = cms.untracked.string('AK4GenJetsCHS'),
     genFatJetName       = cms.untracked.string('AK8GenJetsCHS'),
-    fillAllGen          = cms.untracked.bool(False)
+    fillAllGen          = cms.untracked.bool(True)
   ),
                                    
   PV = cms.untracked.PSet(
