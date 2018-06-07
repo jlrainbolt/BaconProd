@@ -3,7 +3,7 @@ import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = True                                      # flag for if process data
+is_data_flag  = False                                      # flag for if process data
 do_hlt_filter = True                                      # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"   # list of relevant triggers
 do_alpaca     = False
@@ -22,10 +22,7 @@ if is_data_flag:
 
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
-if is_data_flag:
-  process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
-else:
-  process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 #process.load('BaconProd/Ntupler/myQGLFromDB_cff')
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -136,8 +133,8 @@ process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService
 
 process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
 process.load('EgammaAnalysis.ElectronTools.calibratedPatPhotonsRun2_cfi')
-process.calibratedPatElectrons.isMC = cms.bool(False)
-process.calibratedPatPhotons.isMC = cms.bool(False)
+process.calibratedPatElectrons.isMC = cms.bool(True)
+process.calibratedPatPhotons.isMC = cms.bool(True)
 
 # produce photon isolation with proper footprint removal
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
@@ -164,7 +161,6 @@ for idmod in my_id_modules:
 process.electronMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
 process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
 process.photonMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
-
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD(process,
@@ -212,10 +208,10 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('/store/data/Run2016C/DoubleEG/MINIAOD/03Feb2017-v1/80000/00371362-6AEC-E611-9845-842B2B758BAA.root')
-)
+                            fileNames = cms.untracked.vstring('')
+                            )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
 
@@ -249,9 +245,9 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #edmPileupInfoName    = cms.untracked.string('addPileupInfo'),
     edmBeamspotName      = cms.untracked.string('offlineBeamSpot'),
     edmMETName           = cms.untracked.string('slimmedMETs'),
-    edmPFMETName         = cms.untracked.InputTag('slimmedMETsMuEGClean'),
+    edmPFMETName         = cms.untracked.InputTag('slimmedMETsV2','','MakingBacon'),
     edmMVAMETName        = cms.untracked.string(''),
-    edmPuppETName        = cms.untracked.InputTag('slimmedMETsPuppi'),
+    edmPuppETName        = cms.untracked.InputTag('slimmedMETsPuppi','','MakingBacon'),
     edmAlpacaMETName     = cms.untracked.string(alpacaMet),
     edmPupAlpacaMETName  = cms.untracked.string(alpacaPuppiMet),
     edmRhoForIsoName     = cms.untracked.string('fixedGridRhoFastjetAll'),
@@ -315,7 +311,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #puppi
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
-    usePuppi                  = cms.untracked.bool(True),
+    usePuppi                  = cms.untracked.bool(True),    
     fillVertices              = cms.untracked.bool(True)
   ),
   
@@ -596,18 +592,15 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     doAddDepthTime = cms.untracked.bool(False)
   )
 )
-
 process.baconSequence = cms.Sequence(
                                      #process.pfCleaned*
                                      process.regressionApplication    *
                                      process.BadPFMuonFilter          *
                                      process.BadChargedCandidateFilter*
-                                     process.ak4chsL1FastL2L3ResidualChain*
-                                     process.ak8chsL1FastL2L3ResidualChain*
-                                     process.ak4PuppiL1FastL2L3ResidualChain*
-                                     process.ak8PuppiL1FastL2L3ResidualChain*
-                                     process.ak4chsL1FastL2L3Corrector*
-                                     process.ak4PuppiL1FastL2L3Corrector*
+                                     process.ak4chsL1FastL2L3Chain    *
+                                     process.ak8chsL1FastL2L3Chain    *
+                                     process.ak4PuppiL1FastL2L3Chain  *
+                                     process.ak8PuppiL1FastL2L3Chain  *
                                      process.QGTagger                 *
                                      process.pfNoPileUpJME            *
                                      process.electronMVAValueMapProducer *
@@ -617,11 +610,13 @@ process.baconSequence = cms.Sequence(
                                      process.egmGsfElectronIDSequence *
                                      process.egmPhotonIDSequence      *
                                      process.puppiMETSequence         *
-                                     process.AK4jetsequencePuppiData  *
-                                     process.AK8jetsequenceCHSData    *
-                                     process.CA15jetsequenceCHSData   *
-                                     process.AK8jetsequencePuppiData  *
-                                     process.CA15jetsequencePuppiData *
+                                     process.genjetsequence           *
+                                     process.AK4genjetsequenceCHS     *
+                                     process.AK4jetsequencePuppi      *
+                                     process.AK8jetsequenceCHS        *
+                                     process.CA15jetsequenceCHS       *
+                                     process.AK8jetsequencePuppi      *
+                                     process.CA15jetsequencePuppi     *
                                      process.btagging                 *
                                      process.fullPatMetSequenceV2     *
                                      process.fullPatMetSequencePuppi  *

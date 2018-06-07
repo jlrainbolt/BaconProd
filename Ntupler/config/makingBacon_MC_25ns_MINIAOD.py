@@ -212,13 +212,9 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(20))
 process.source = cms.Source("PoolSource",
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/F62B1C9B-4DB9-E611-8816-0025905A611E.root')
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/110000/005ED0EB-79F1-E611-B6DA-02163E011C2B.root')
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/0A341391-FFD5-E611-9BB7-0CC47A78A3E8.root')
-                            #fileNames = cms.untracked.vstring('file:pho_calib_test_event.root')
-                            fileNames = cms.untracked.vstring('file:dy_mc_file.root')
+                            fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/110000/005ED0EB-79F1-E611-B6DA-02163E011C2B.root')
                             )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -274,10 +270,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
 
   GenJet  = cms.untracked.PSet(
-    isActive            = ( cms.untracked.bool(False)),
-    isActiveFatJet      = ( cms.untracked.bool(False)),
-    #isActive            = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
-    #isActiveFatJet      = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
+    isActive            = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
+    isActiveFatJet      = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
     edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
     genJetName          = cms.untracked.string('AK4GenJetsCHS'),
     genFatJetName       = cms.untracked.string('AK8GenJetsCHS'),

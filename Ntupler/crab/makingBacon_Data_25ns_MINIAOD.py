@@ -22,10 +22,7 @@ if is_data_flag:
 
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
-if is_data_flag:
-  process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
-else:
-  process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 #process.load('BaconProd/Ntupler/myQGLFromDB_cff')
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -138,7 +135,6 @@ process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
 process.load('EgammaAnalysis.ElectronTools.calibratedPatPhotonsRun2_cfi')
 process.calibratedPatElectrons.isMC = cms.bool(False)
 process.calibratedPatPhotons.isMC = cms.bool(False)
-
 # produce photon isolation with proper footprint removal
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
@@ -164,7 +160,6 @@ for idmod in my_id_modules:
 process.electronMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedElectrons')
 process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
 process.photonMVAValueMapProducer.srcMiniAOD = cms.InputTag('slimmedPhotons')
-
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD(process,
@@ -212,9 +207,9 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('/store/data/Run2016C/DoubleEG/MINIAOD/03Feb2017-v1/80000/00371362-6AEC-E611-9845-842B2B758BAA.root')
+                            fileNames = cms.untracked.vstring('')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
