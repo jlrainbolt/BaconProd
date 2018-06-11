@@ -12,7 +12,7 @@ Recipe for setup and running:
 ```Shell
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmsrel CMSSW_8_0_26_patch1
-cd CMSSW_8_0_26_patch1
+cd CMSSW_8_0_26_patch1/src
 cmsenv
 git cms-init
 git cms-merge-topic rafaellopesdesa:RegressionCheckNegEnergy
