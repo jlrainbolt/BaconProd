@@ -205,9 +205,10 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('file:data.root')
+                            #fileNames = cms.untracked.vstring('file:data.root')
+                            fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/90000/FEA296CB-1737-E811-9CBF-90B11C0BD35F.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -309,8 +310,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90'),
     edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80'),
     edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Values'),
-    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories')
-
+    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories'),
+    fillVertices              = cms.untracked.bool(True)
   ),
   
   Muon = cms.untracked.PSet(
@@ -321,6 +322,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),
+    fillVertices              = cms.untracked.bool(True),
     useTriggerObject          = cms.untracked.bool(False),    
   ),
   
@@ -448,7 +450,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     useTriggerObject     = cms.untracked.bool(False),
-    minPt                = cms.untracked.double(180),
+    minPt                = cms.untracked.double(50),
     coneSize             = cms.untracked.double(0.8),
     doComputeFullJetInfo = cms.untracked.bool(False),
     doComputeSVInfo      = cms.untracked.bool(False),

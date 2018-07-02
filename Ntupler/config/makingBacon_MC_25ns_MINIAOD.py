@@ -206,12 +206,13 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-4000_W-40_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/02DEA6C9-19B7-E611-B22D-A0000420FE80.root'),
                             #fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAOD/QCD_HT1000to1500_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/50000/EEF28E00-0CEA-E711-8257-02163E0160F1.root'),
                             #fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAOD/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/46FB5EDE-F708-E811-A50F-0025905C53A4.root')
-                            fileNames = cms.untracked.vstring('file:test.root'),
+                            fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/FEB3954C-4942-E811-8A09-008CFAC91A38.root')
+                            #fileNames = cms.untracked.vstring('file:test.root'),
                             #skipEvents = cms.untracked.uint32(0),
 )
 
@@ -265,8 +266,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmGenEventInfoName     = cms.untracked.string('generator'),
     edmGenParticlesName     = cms.untracked.string('prunedGenParticles'),
     edmGenPackParticlesName = cms.untracked.string('packedGenParticles'),
-    fillAllGen          = cms.untracked.bool(False),
-    fillLHEWeights      = cms.untracked.bool(False)
+    fillAllGen          = cms.untracked.bool(True),
+    fillLHEWeights      = cms.untracked.bool(True)
   ),
 
   GenJet  = cms.untracked.PSet(
@@ -319,7 +320,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90'),
     edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80'),
     edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Values'),
-    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories')
+    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories'),
+    fillVertices              = cms.untracked.bool(True)
   ),
   
   Muon = cms.untracked.PSet(
@@ -330,6 +332,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),    
+    fillVertices              = cms.untracked.bool(True),
     useTriggerObject          = cms.untracked.bool(False),
   ),
   
@@ -462,7 +465,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
     useTriggerObject     = cms.untracked.bool(False),
-    minPt                = cms.untracked.double(180),
+    minPt                = cms.untracked.double(50),
     coneSize             = cms.untracked.double(0.8),
     doComputeFullJetInfo = cms.untracked.bool(False),
     doComputeSVInfo      = cms.untracked.bool(False),

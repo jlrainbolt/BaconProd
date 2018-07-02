@@ -45,6 +45,7 @@ namespace baconhep
 
       // === filler for MINIAOD ===
       void fill(TClonesArray                                 *array,            // output array to be filled
+                TClonesArray                                 *array2,            // output array to be filled
                 const edm::Event                             &iEvent,           // event info
                 const edm::EventSetup                        &iSetup,           // event setup info
                 const reco::Vertex                           &pv,               // event primary vertex
@@ -76,6 +77,7 @@ namespace baconhep
       std::string fPuppiName; 
       std::string fPuppiNoLepName; 
       bool fUsePuppi;
+      bool fFillVertices;
       bool fUseTO;  
       bool fUseAOD;
       

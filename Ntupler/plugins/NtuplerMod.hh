@@ -120,7 +120,9 @@ class NtuplerMod : public edm::EDAnalyzer {
     bool fIsActiveGenFatJet;
     bool fIsActivePV;
     bool fIsActiveEle;
+    bool fFillVerticesEle;
     bool fIsActiveMuon;
+    bool fFillVerticesMuon;
     bool fIsActivePhoton;
     bool fIsActiveTau;
     bool fIsActiveCaloJet;
@@ -143,7 +145,9 @@ class NtuplerMod : public edm::EDAnalyzer {
     TClonesArray            *fGenJetArr;
     TClonesArray            *fGenFatJetArr;
     TClonesArray	    *fEleArr;
+    TClonesArray	    *fdielectronArr;
     TClonesArray	    *fMuonArr;
+    TClonesArray	    *fdimuonArr;
     TClonesArray	    *fTauArr;
     TClonesArray	    *fCaloJetArr;
     TClonesArray	    *fJetArr, *fFatJetArr, *fFatterJetArr;

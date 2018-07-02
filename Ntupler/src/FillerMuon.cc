@@ -2,18 +2,31 @@
 #include "BaconProd/Utils/interface/TriggerTools.hh"
 #include "BaconAna/DataFormats/interface/BaconAnaDefs.hh"
 #include "BaconAna/DataFormats/interface/TMuon.hh"
+#include "BaconAna/DataFormats/interface/TVertex.hh"
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+#include "RecoVertex/KalmanVertexFit/interface/SimpleVertexTree.h"
+#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 #include <TClonesArray.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
 
+#include <map>
+
+static const double MUON_MASS = 0.105658369;
+
 using namespace baconhep;
 
+template<class T>
+void copy_p4(const T* lhs, float mass, TLorentzVector& rhs) {
+        rhs.SetPtEtaPhiM(lhs->pt, lhs->eta, lhs->phi, mass);
+}
 //--------------------------------------------------------------------------------------------------
 FillerMuon::FillerMuon(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
   fMinPt         (iConfig.getUntrackedParameter<double>("minPt",0)),
@@ -25,6 +38,7 @@ FillerMuon::FillerMuon(const edm::ParameterSet &iConfig, const bool useAOD,edm::
   fPuppiName     (iConfig.getUntrackedParameter<std::string>("edmPuppiName","puppi")),
   fPuppiNoLepName(iConfig.getUntrackedParameter<std::string>("edmPuppiNoLepName","puppiNoLep")),
   fUsePuppi      (iConfig.getUntrackedParameter<bool>("usePuppi",true)),
+  fFillVertices  (iConfig.getUntrackedParameter<bool>("fillVertices",false)),
   fUseTO         (iConfig.getUntrackedParameter<bool>("useTriggerObject",false)),
   fUseAOD        (useAOD)
 {
@@ -110,6 +124,7 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->phi    = itMu->muonBestTrack()->phi();
     pMuon->ptErr  = itMu->muonBestTrack()->ptError();
     pMuon->q      = itMu->muonBestTrack()->charge();
+    pMuon->btt    = itMu->muonBestTrackType();
     pMuon->staPt  = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->pt()  : 0;
     pMuon->staEta = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->eta() : 0;
     pMuon->staPhi = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->phi() : 0;   
@@ -331,11 +346,13 @@ void FillerMuon::fill(TClonesArray *array,
 
 // === filler for MINIAOD ===
 void FillerMuon::fill(TClonesArray *array,
+                      TClonesArray *array2,
                       const edm::Event &iEvent, const edm::EventSetup &iSetup, const reco::Vertex &pv,
                       const std::vector<TriggerRecord> &triggerRecords,
                       const pat::TriggerObjectStandAloneCollection &triggerObjects)
 {
   assert(array);
+  assert(array2);
 
   const pat::PackedCandidateCollection *pfPuppi      = 0;
   const pat::PackedCandidateCollection *pfPuppiNoLep = 0;
@@ -357,6 +374,10 @@ void FillerMuon::fill(TClonesArray *array,
   iEvent.getByToken(fTokPatMuonName,hMuonProduct);
   assert(hMuonProduct.isValid());
   const pat::MuonCollection *muonCol = hMuonProduct.product();
+  // Track builder for computing 3D impact parameter
+  edm::ESHandle<TransientTrackBuilder> hTransientTrackBuilder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",hTransientTrackBuilder);
+  const TransientTrackBuilder *transientTrackBuilder = hTransientTrackBuilder.product();  
 
   for(pat::MuonCollection::const_iterator itMu = muonCol->begin(); itMu!=muonCol->end(); ++itMu) {
 
@@ -370,6 +391,7 @@ void FillerMuon::fill(TClonesArray *array,
     new(rArray[index]) baconhep::TMuon();
     baconhep::TMuon *pMuon = (baconhep::TMuon*)rArray[index];
 
+    pMuon->muIndex = itMu - muonCol->begin();
 
     //
     // Kinematics
@@ -379,6 +401,7 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->phi    = itMu->muonBestTrack()->phi();
     pMuon->ptErr  = itMu->muonBestTrack()->ptError();
     pMuon->q      = itMu->muonBestTrack()->charge();
+    pMuon->btt    = itMu->muonBestTrackType();
     pMuon->staPt  = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->pt()  : 0;
     pMuon->staEta = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->eta() : 0;
     pMuon->staPhi = itMu->standAloneMuon().isNonnull() ? itMu->standAloneMuon()->phi() : 0;
@@ -399,6 +422,10 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->neuHadIso = itMu->pfIsolationR04().sumNeutralHadronEt;
     pMuon->puIso     = itMu->pfIsolationR04().sumPUPt;
 
+    pMuon->chHadIso03  = itMu->pfIsolationR03().sumChargedHadronPt;
+    pMuon->gammaIso03  = itMu->pfIsolationR03().sumPhotonEt;
+    pMuon->neuHadIso03 = itMu->pfIsolationR03().sumNeutralHadronEt;
+    pMuon->puIso03     = itMu->pfIsolationR03().sumPUPt;
     if(fUsePuppi) { 
       double pEta = pMuon->pfEta;
       double pPhi = pMuon->pfPhi;
@@ -421,7 +448,11 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->d0    = (-1)*(itMu->muonBestTrack()->dxy(pv.position()));  // note: d0 = -dxy
     pMuon->dz    = itMu->muonBestTrack()->dz(pv.position());
     pMuon->sip3d = (itMu->edB(pat::Muon::PV3D) > 0) ? itMu->dB(pat::Muon::PV3D)/itMu->edB(pat::Muon::PV3D) : -999;
+    pMuon->x     = itMu->muonBestTrack()->vx();
+    pMuon->y     = itMu->muonBestTrack()->vy();
+    pMuon->z     = itMu->muonBestTrack()->vz();
 
+    const reco::TransientTrack &tt = transientTrackBuilder->build(itMu->muonBestTrack());
 
     //
     // Identification
@@ -481,6 +512,57 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->trkID = -1;  // general tracks not in MINIAOD
 
     if(fUseTO) pMuon->hltMatchBits = TriggerTools::matchHLT(pMuon->eta, pMuon->phi, triggerRecords, triggerObjects);
+    if (!fFillVertices) continue;
+    // Loop over other muons and fit dimuon vertices
+    if(itMu == muonCol->end()) continue;
+    for(pat::MuonCollection::const_iterator itMu2 = itMu; itMu2!=muonCol->end(); ++itMu2) {
+        if(itMu2 == itMu) continue;
+        if(itMu2->pt() < fMinPt) continue;
+        baconhep::TMuon *pMuon2 = new baconhep::TMuon;
+        
+        pMuon2->pt     = itMu2->muonBestTrack()->pt();
+        pMuon2->eta    = itMu2->muonBestTrack()->eta();
+        pMuon2->phi    = itMu2->muonBestTrack()->phi();
+        pMuon2->ptErr  = itMu2->muonBestTrack()->ptError();
+        pMuon2->q      = itMu2->muonBestTrack()->charge();
+        pMuon2->muIndex = itMu2 - muonCol->begin();
+        
+        TLorentzVector muon1P4, muon2P4;
+        copy_p4(pMuon, MUON_MASS, muon1P4);
+        copy_p4(pMuon2, MUON_MASS, muon2P4);
+        TLorentzVector dimuon = muon1P4 + muon2P4;
+        TClonesArray &rArray2 = *array2;
+        //assert(rArray2.GetEntries() < rArray2.GetSize());
+        const int index2 = rArray2.GetEntries();
+        new(rArray2[index2]) baconhep::TVertex();
+        baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
+             
+        const reco::TransientTrack &tt2 = transientTrackBuilder->build(itMu2->muonBestTrack());
+        std::vector<reco::TransientTrack> t_tks = {tt,tt2};
+
+        KalmanVertexFitter fitter;
+        TransientVertex myVertex = fitter.vertex(t_tks);
+        if (myVertex.isValid()) {
+            savedVertex->index1 = pMuon->muIndex;
+            savedVertex->index2 = pMuon2->muIndex;
+            savedVertex->isValid = myVertex.isValid();
+            savedVertex->chi2 = myVertex.totalChiSquared();
+            savedVertex->ndof = myVertex.degreesOfFreedom();
+            savedVertex->x = myVertex.position().x();
+            savedVertex->y = myVertex.position().y();
+            savedVertex->z = myVertex.position().z();
+            savedVertex->xerr = myVertex.positionError().cxx();
+            savedVertex->yerr = myVertex.positionError().cyy();
+            savedVertex->zerr = myVertex.positionError().czz();
+            // New stuff
+            VertexDistanceXY vdistXY;
+            Measurement1D distXY = vdistXY.distance(myVertex, pv);
+            savedVertex->prob = ChiSquaredProbability(myVertex.totalChiSquared(), myVertex.degreesOfFreedom());
+            savedVertex->rxy = distXY.value();
+            savedVertex->rxy_err = distXY.error();
+        }
+    delete pMuon2;
+    }
   }
 }
 void FillerMuon::computeIso(double &iEta,double &iPhi, const double extRadius,
