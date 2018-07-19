@@ -205,10 +205,11 @@ if do_alpaca:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 process.source = cms.Source("PoolSource",
                             #fileNames = cms.untracked.vstring('file:data.root')
-                            fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/90000/FEA296CB-1737-E811-9CBF-90B11C0BD35F.root')
+                            #fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/90000/FEA296CB-1737-E811-9CBF-90B11C0BD35F.root')
+                            fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleEG/MINIAOD/31Mar2018-v1/00000/64145829-8037-E811-9AC4-A4BF011594CC.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -293,7 +294,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),
-    useTriggerObject          = cms.untracked.bool(False),
+    useTriggerObject          = cms.untracked.bool(True),
     edmEcalPFClusterIsoMapTag = cms.untracked.InputTag('electronEcalPFClusterIsolationProducer'),
     edmHcalPFClusterIsoMapTag = cms.untracked.InputTag('electronHcalPFClusterIsolationProducer'),
     #----------------------    SETTINGS FOR 2016 (8X)     -----------------------
@@ -323,7 +324,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),
     fillVertices              = cms.untracked.bool(True),
-    useTriggerObject          = cms.untracked.bool(False),    
+    useTriggerObject          = cms.untracked.bool(True),    
   ),
   
   Photon = cms.untracked.PSet(
@@ -339,7 +340,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #FOR 2017 (8X)
     edmPhoMVAIdTag        = cms.untracked.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRunIIFall17v1Values"),
     #edmPhoMVAIdTag        = cms.untracked.InputTag(""),
-    useTriggerObject      = cms.untracked.bool(False),
+    useTriggerObject      = cms.untracked.bool(True),
   ),
   
   Tau = cms.untracked.PSet(
@@ -349,13 +350,13 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPuppiName              = cms.untracked.string('puppi'),
     edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
     usePuppi                  = cms.untracked.bool(True),
-    useTriggerObject          = cms.untracked.bool(False),
+    useTriggerObject          = cms.untracked.bool(True),
   ),
   
   AK4CHS = cms.untracked.PSet(
     isActive             = cms.untracked.bool(True),
     useAOD               = cms.untracked.bool(False),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     minPt                = cms.untracked.double(15),
     coneSize             = cms.untracked.double(0.4),
     addPFCand            = cms.untracked.bool(False),
@@ -386,7 +387,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   AK4Puppi = cms.untracked.PSet(
     isActive             = cms.untracked.bool(True),
     useAOD               = cms.untracked.bool(True),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(20),
     coneSize             = cms.untracked.double(0.4),
@@ -449,7 +450,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   AK8CHS = cms.untracked.PSet(
     isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     minPt                = cms.untracked.double(50),
     coneSize             = cms.untracked.double(0.8),
     doComputeFullJetInfo = cms.untracked.bool(False),
@@ -509,7 +510,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   CA8CHS = cms.untracked.PSet(
     isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(False),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
     coneSize             = cms.untracked.double(0.8),
     doComputeFullJetInfo = cms.untracked.bool(False),
@@ -556,7 +557,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   AK8Puppi = cms.untracked.PSet(
     isActive             = cms.untracked.bool(True),
     useAOD               = cms.untracked.bool(True),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
     coneSize             = cms.untracked.double(0.8),
@@ -618,7 +619,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   CA15CHS = cms.untracked.PSet(
     isActive             = cms.untracked.bool(False),
     useAOD               = cms.untracked.bool(True),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
     coneSize             = cms.untracked.double(1.5),
     doComputeFullJetInfo = cms.untracked.bool(False),
@@ -675,7 +676,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   ),
   CA15Puppi = cms.untracked.PSet(
     isActive             = cms.untracked.bool(True),
-    useTriggerObject     = cms.untracked.bool(False),
+    useTriggerObject     = cms.untracked.bool(True),
     useAOD               = cms.untracked.bool(True),
     applyJEC             = cms.untracked.bool(True),
     minPt                = cms.untracked.double(180),
