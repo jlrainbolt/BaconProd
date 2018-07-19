@@ -426,6 +426,10 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->scEta      = sc->eta();
     pElectron->scPhi      = sc->phi();
 
+    auto corrP4 = itEle->p4() * itEle->userFloat("ecalTrkEnergyPostCorr") / itEle->energy();
+    pElectron->calibPt = corrP4.Pt();
+    pElectron->calibE = corrP4.E();
+
     pElectron->pfPt  = 0;
     pElectron->pfEta = 0;
     pElectron->pfPhi = 0;

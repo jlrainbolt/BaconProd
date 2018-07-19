@@ -283,6 +283,12 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->scEta = sc->eta();
     pPhoton->scPhi = sc->phi();
 
+    auto corrP4 = itPho->p4() * itPho->userFloat("ecalEnergyPostCorr") / itPho->energy();
+    pPhoton->calibPt = corrP4.Pt();
+    pPhoton->calibE = corrP4.E();
+
+    pPhoton->eRes = itPho->getCorrectedEnergyError(itPho->getCandidateP4type())/itPho->getCorrectedEnergy(itPho->getCandidateP4type());
+
 
     //
     // Isolation
