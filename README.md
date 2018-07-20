@@ -25,15 +25,7 @@ git cms-init
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
 git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconAna
 git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconProd
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/CommonTools .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/CondFormats .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/DataFormats .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/JetMETCorrections .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/PhysicsTools .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/RecoBTag .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/RecoBTau .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/RecoMET .
-cp -r /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/ShowerDeconstruction .
+tar -xzvf /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/jbueghly_2017_depends.tar.gz .
 scram b clean
 scram b -j 12
 ```
