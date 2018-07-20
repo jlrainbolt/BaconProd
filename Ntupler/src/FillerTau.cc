@@ -364,6 +364,9 @@ void FillerTau::fill(TClonesArray *array,
     pat::PackedCandidate const* packedLeadTauCand = dynamic_cast<pat::PackedCandidate const*>(itTau->leadChargedHadrCand().get());
     pTau->dzLeadChHad = (packedLeadTauCand)?packedLeadTauCand->dz():-999;
     pTau->d0LeadChHad = (packedLeadTauCand)?-packedLeadTauCand->dxy():-999;
+    pTau->xLeadChHad  = (packedLeadTauCand)?packedLeadTauCand->vx():-999;
+    pTau->yLeadChHad  = (packedLeadTauCand)?packedLeadTauCand->vy():-999;
+    pTau->zLeadChHad  = (packedLeadTauCand)?packedLeadTauCand->vz():-999;
     
     //
     // Isolation
