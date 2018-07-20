@@ -124,29 +124,11 @@ if is_data_flag:
   process.AK8QGTaggerSubJetsCHS.jec  = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
   process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
-process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
-process.load("RecoEgamma.PhotonIdentification.egmPhotonIDs_cfi")
-process.load("RecoEgamma.ElectronIdentification.ElectronMVAValueMapProducer_cfi")
-process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
-process.load("RecoEgamma/PhotonIdentification/PhotonMVAValueMapProducer_cfi")
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
-switchOnVIDPhotonIdProducer(process, DataFormat.MiniAOD)
-my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.mvaPhotonID_Spring15_25ns_nonTrig_V2p1_cff',
-                 'RecoEgamma.PhotonIdentification.Identification.mvaPhotonID_Fall17_94X_V1_cff',
-                 ]
-for idmod in my_id_modules:
-    setupAllVIDIdsInModule(process,idmod,setupVIDPhotonSelection)
-
-switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_noIso_V1_cff',
-                 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Fall17_iso_V1_cff',
-                 ]
-for idmod in my_id_modules:
-   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+# regression 
+from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+setupEgammaPostRecoSeq(process,
+                       runVID=False, #saves CPU time by not needlessly re-running VID
+                       era='2017-Nov17ReReco')
 
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
@@ -303,15 +285,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
     #edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories')
     #----------------------    SETTINGS FOR 2017 (9X)     -----------------------
-    edmEleMediumIdIsoMapTag   = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wp90'),
-    edmEleTightIdIsoMapTag    = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-iso-V1-wp80'),
-    edmMVAValuesIsoTag        = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV1Values'),
-    edmMVACatsIsoTag          = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17IsoV1Categories'),
     storeSecondMVA            = cms.untracked.bool(True),
-    edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp90'),
-    edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Fall17-noIso-V1-wp80'),
-    edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Values'),
-    edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV1Categories'),
     fillVertices              = cms.untracked.bool(True)
   ),
   
@@ -338,8 +312,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #FOR 2016 (8X)
     #edmPhoMVAIdTag        = cms.untracked.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRun2Spring15NonTrig25nsV2p1Values")
     #FOR 2017 (8X)
-    edmPhoMVAIdTag        = cms.untracked.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRunIIFall17v1Values"),
-    #edmPhoMVAIdTag        = cms.untracked.InputTag(""),
     useTriggerObject      = cms.untracked.bool(True),
   ),
   
@@ -751,11 +723,7 @@ process.baconSequence = cms.Sequence(
                                      process.ak4chsL1FastL2L3Corrector*
                                      process.ak4PuppiL1FastL2L3Corrector*
                                      process.pfNoPileUpJME            *
-                                     process.electronMVAValueMapProducer *
-                                     process.photonIDValueMapProducer *
-                                     process.photonMVAValueMapProducer*
-                                     process.egmGsfElectronIDSequence *
-                                     process.egmPhotonIDSequence      *
+                                     process.egammaPostRecoSeq        *
                                      process.puppiMETSequence          *
                                      #process.genjetsequence           *
                                      #process.AK4genjetsequenceCHS     *

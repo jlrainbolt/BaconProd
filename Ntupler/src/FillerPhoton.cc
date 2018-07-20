@@ -34,11 +34,9 @@ FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,e
   fChHadIsoMapTag    (iConfig.getUntrackedParameter<edm::InputTag>("edmChHadIsoMapTag")),
   fNeuHadIsoMapTag   (iConfig.getUntrackedParameter<edm::InputTag>("edmNeuHadIsoMapTag")),
   fGammaIsoMapTag    (iConfig.getUntrackedParameter<edm::InputTag>("edmGammaIsoMapTag")),
-  fPhoMVAMapTag      (iConfig.getUntrackedParameter<edm::InputTag>("edmPhoMVAIdTag")),
   fUseTO             (iConfig.getUntrackedParameter<bool>("useTriggerObject",false)),
   fUseAOD            (useAOD)
 {
-//  fPhotonMVA = new PhotonMVACalculator();
   if(fUseAOD)  fTokPhotonName    =  iC.consumes<reco::PhotonCollection>     (fPhotonName);
   if(!fUseAOD) fTokPatPhotonName =  iC.consumes<pat::PhotonCollection>      (fPhotonName);
   fTokPFCandName =  iC.consumes<reco::PFCandidateCollection>(fPFCandName);
@@ -49,7 +47,6 @@ FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,e
   fTokChHadIsoMapTag  =  iC.consumes<edm::ValueMap<float> >(fChHadIsoMapTag);
   fTokNeuHadIsoMapTag =  iC.consumes<edm::ValueMap<float> >(fNeuHadIsoMapTag);
   fTokGammaIsoMapTag  =  iC.consumes<edm::ValueMap<float> >(fGammaIsoMapTag);
-  fTokPhoMVAMapTag    =  iC.consumes<edm::ValueMap<float> >(fPhoMVAMapTag);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -119,9 +116,9 @@ void FillerPhoton::fill(TClonesArray *array,
   iEvent.getByToken(fTokGammaIsoMapTag, hGammaIsoMap);
   assert(hGammaIsoMap.isValid());
 
-  edm::Handle<edm::ValueMap<float> > hPhoMVAMap;
+  /*edm::Handle<edm::ValueMap<float> > hPhoMVAMap;
   iEvent.getByToken(fTokPhoMVAMapTag, hPhoMVAMap);
-  assert(hPhoMVAMap.isValid());
+  assert(hPhoMVAMap.isValid()); */
 
   for(reco::PhotonCollection::const_iterator itPho = photonCol->begin(); itPho!=photonCol->end(); ++itPho) {
     
@@ -209,7 +206,7 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->passElectronVeto = !(pPhoton->isConv); // here for backwards compatibility
 
     // Photon MVA ID: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariatePhotonIdentificationRun2
-    pPhoton->mva = (*hPhoMVAMap)[phoBaseRef]; //(!) fPhotonMVA->mvaValue((*itPho),lazyTools,*hRho,pPhoton->gammaIso03,pPhoton->chHadIso03SelVtx,pPhoton->chHadIso03WstVtx,lRR);
+    //pPhoton->mva = (*hPhoMVAMap)[phoBaseRef]; //(!) fPhotonMVA->mvaValue((*itPho),lazyTools,*hRho,pPhoton->gammaIso03,pPhoton->chHadIso03SelVtx,pPhoton->chHadIso03WstVtx,lRR);
     
     if(fUseTO) pPhoton->hltMatchBits = TriggerTools::matchHLT(pPhoton->eta, pPhoton->phi, triggerRecords, triggerEvent);
   }
@@ -248,11 +245,6 @@ void FillerPhoton::fill(TClonesArray *array,
   iEvent.getByToken(fTokGammaIsoMapTag, hGammaIsoMap);
   assert(hGammaIsoMap.isValid());
   */
-  edm::Handle<edm::ValueMap<float> > hPhoMVAMap;
-  if(fPhoMVAMapTag.label().size() > 0) {
-    iEvent.getByToken(fTokPhoMVAMapTag, hPhoMVAMap);
-    assert(hPhoMVAMap.isValid());
-  }
 
   for(pat::PhotonCollection::const_iterator itPho = photonCol->begin(); itPho!=photonCol->end(); ++itPho) {
 
@@ -345,8 +337,8 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->isConv           = !itPho->passElectronVeto();
     pPhoton->passElectronVeto = itPho->passElectronVeto(); // here for backwards compatibility
 
-    // Photon MVA ID: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariatePhotonIdentificationRun2
-    if(fPhoMVAMapTag.label().size() > 0) pPhoton->mva = (*hPhoMVAMap)[phoBaseRef];//itPho->photonID("egmPhotonIDs:mvaPhoID-Spring15-25ns-nonTrig-V2-wp90");
+    pPhoton->mva = itPho->userFloat("PhotonMVAEstimatorRunIIFall17v1Values");
+    pPhoton->mvaCat = itPho->userInt("PhotonMVAEstimatorRunIIFall17v1Categories");
 
     if(fUseTO) pPhoton->hltMatchBits = TriggerTools::matchHLT(pPhoton->eta, pPhoton->phi, triggerRecords, triggerObjects);
   }

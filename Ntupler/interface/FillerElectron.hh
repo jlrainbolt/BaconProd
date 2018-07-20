@@ -88,13 +88,7 @@ namespace baconhep
       edm::InputTag fHcalPFClusterIsoMapTag;
       edm::InputTag fEleMediumIdMapTag;
       edm::InputTag fEleTightIdMapTag;
-      edm::InputTag fMVAValuesMapTag;
-      edm::InputTag fMVACatsMapTag;
       bool fSecondMVA;
-      edm::InputTag fEleMediumIdIsoMapTag;
-      edm::InputTag fEleTightIdIsoMapTag;
-      edm::InputTag fMVAValuesIsoMapTag;
-      edm::InputTag fMVACatsIsoMapTag;
       bool fUseTO;
       bool fFillVertices;
       bool fUseAOD;
@@ -112,14 +106,6 @@ namespace baconhep
       edm::EDGetTokenT<reco::SuperClusterCollection> fTokSCName;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokEcalPFClusterIsoMap;
       edm::EDGetTokenT<edm::ValueMap<float> > fTokHcalPFClusterIsoMap;
-      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleMediumIdMap;
-      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleTightIdMap;
-      edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAValuesMap;
-      edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVACatsMap;
-      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleMediumIdIsoMap;
-      edm::EDGetTokenT<edm::ValueMap<bool> >  fTokEleTightIdIsoMap;
-      edm::EDGetTokenT<edm::ValueMap<float> > fTokEleMVAValuesIsoMap;
-      edm::EDGetTokenT<edm::ValueMap<int> >   fTokEleMVACatsIsoMap;
   };
 }
 #endif
