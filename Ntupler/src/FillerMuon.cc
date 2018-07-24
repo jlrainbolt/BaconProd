@@ -452,7 +452,8 @@ void FillerMuon::fill(TClonesArray *array,
     pMuon->y     = itMu->muonBestTrack()->vy();
     pMuon->z     = itMu->muonBestTrack()->vz();
 
-    const reco::TransientTrack &tt = transientTrackBuilder->build(itMu->muonBestTrack());
+    reco::TransientTrack *tt = new reco::TransientTrack(); 
+    *tt = transientTrackBuilder->build(itMu->muonBestTrack());
 
     //
     // Identification
@@ -515,6 +516,7 @@ void FillerMuon::fill(TClonesArray *array,
     if (!fFillVertices) continue;
     // Loop over other muons and fit dimuon vertices
     if(itMu == muonCol->end()) continue;
+    reco::TransientTrack *tt2 = new reco::TransientTrack();
     for(pat::MuonCollection::const_iterator itMu2 = itMu; itMu2!=muonCol->end(); ++itMu2) {
         if(itMu2 == itMu) continue;
         if(itMu2->pt() < fMinPt) continue;
@@ -537,8 +539,10 @@ void FillerMuon::fill(TClonesArray *array,
         new(rArray2[index2]) baconhep::TVertex();
         baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
              
-        const reco::TransientTrack &tt2 = transientTrackBuilder->build(itMu2->muonBestTrack());
-        std::vector<reco::TransientTrack> t_tks = {tt,tt2};
+        *tt2 = transientTrackBuilder->build(itMu2->muonBestTrack());
+        std::vector<reco::TransientTrack> t_tks;
+        t_tks.push_back(*tt);
+        t_tks.push_back(*tt2);
 
         KalmanVertexFitter fitter;
         TransientVertex myVertex = fitter.vertex(t_tks);
@@ -563,6 +567,8 @@ void FillerMuon::fill(TClonesArray *array,
         }
     delete pMuon2;
     }
+  delete tt;
+  delete tt2;
   }
 }
 void FillerMuon::computeIso(double &iEta,double &iPhi, const double extRadius,

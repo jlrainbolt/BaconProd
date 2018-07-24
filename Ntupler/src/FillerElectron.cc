@@ -431,7 +431,8 @@ void FillerElectron::fill(TClonesArray *array,
     //
     // Impact Parameter
     //==============================
-    const reco::TransientTrack &tt = transientTrackBuilder->build(gsfTrack);
+    reco::TransientTrack *tt = new reco::TransientTrack();
+    *tt = transientTrackBuilder->build(gsfTrack);
     if(gsfTrack.isNonnull()) {
       pElectron->d0    = (-1)*(gsfTrack->dxy(pv.position()));  // note: d0 = -dxy
       pElectron->dz    = gsfTrack->dz(pv.position());
@@ -505,6 +506,7 @@ void FillerElectron::fill(TClonesArray *array,
     if (!fFillVertices) continue;
     // Loop over other electrons and fit dielectron vertices
     if(itEle == eleCol->end()) continue;
+    reco::TransientTrack *tt2 = new reco::TransientTrack();
     for(pat::ElectronCollection::const_iterator itEle2 = itEle; itEle2!=eleCol->end(); ++itEle2) {
         if(itEle2 == itEle) continue;
         if(itEle2->pt() < fMinPt) continue;
@@ -530,18 +532,20 @@ void FillerElectron::fill(TClonesArray *array,
         const int index2 = rArray2.GetEntries();
         new(rArray2[index2]) baconhep::TVertex();
         baconhep::TVertex *savedVertex = (baconhep::TVertex*)rArray2[index2];
-             
-        const reco::TransientTrack &tt2 = transientTrackBuilder->build(itEle2->gsfTrack());
-        std::vector<reco::TransientTrack> t_tks = {tt,tt2};
+
+        *tt2 = transientTrackBuilder->build(itEle2->gsfTrack());
+        std::vector<reco::TransientTrack> t_tks;
+        t_tks.push_back(*tt);
+        t_tks.push_back(*tt2);
     
         KalmanVertexFitter fitter;
         TransientVertex myVertex = fitter.vertex(t_tks);
+        if (myVertex.isValid()) {
         savedVertex->index1 = pElectron->eleIndex;
         savedVertex->index2 = pElectron2->eleIndex;
         savedVertex->isValid = myVertex.isValid();
         savedVertex->chi2 = myVertex.totalChiSquared();
         savedVertex->ndof = myVertex.degreesOfFreedom();
-        if (myVertex.isValid()) {
         savedVertex->x = myVertex.position().x();
         savedVertex->y = myVertex.position().y();
         savedVertex->z = myVertex.position().z();
@@ -551,6 +555,8 @@ void FillerElectron::fill(TClonesArray *array,
         }
     delete pElectron2;
     }
+  delete tt;
+  delete tt2;
   }
 }
 
