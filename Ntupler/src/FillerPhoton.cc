@@ -336,6 +336,7 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->sieie    = itPho->full5x5_sigmaIetaIeta();
     pPhoton->sipip    = 0;  // (!) todo (lazy tools)
     pPhoton->r9       = itPho->r9();  // (!) change to full5x5 after 7_2_0 MC?
+    pPhoton->r9_full5x5       = itPho->full5x5_r9();
 
     pPhoton->fiducialBits=0;
     if(itPho->isEB())        pPhoton->fiducialBits |= kIsEB;
