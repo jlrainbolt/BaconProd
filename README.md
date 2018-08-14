@@ -23,9 +23,10 @@ cd CMSSW_9_4_9_cand2/src
 cmsenv
 git cms-init
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
+git cms-merge-topic cms-met:METFixEE2017_949
 git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconAna
 git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconProd
-tar -xzvf /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/jbueghly_2017_depends.tar.gz .
+tar -xzvf /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/jbueghly_2017_depends.tar.gz 
 scram b clean
 scram b -j 12
 ```
