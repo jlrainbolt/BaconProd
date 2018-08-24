@@ -4,7 +4,7 @@ import os
 process = cms.Process('MakingBacon')
 
 is_data_flag  = True                                      # flag for if process data
-do_hlt_filter = False                                      # flag to skip events that fail relevant triggers
+do_hlt_filter = True                                      # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"   # list of relevant triggers
 do_alpaca     = False
 

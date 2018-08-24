@@ -67,7 +67,7 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = 'sync_workarea'
+        config.General.workArea = '2016_data_prod'
         config.General.transferOutputs = True
         config.General.transferLogs = False
 
@@ -105,7 +105,7 @@ def main():
                             #'/SingleMuon/Run2016H-03Feb2017_ver2-v1/MINIAOD',
                             #'/SingleMuon/Run2016H-03Feb2017_ver3-v1/MINIAOD',
 
-                            '/DoubleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD',
+                            #'/DoubleMuon/Run2016B-03Feb2017_ver2-v2/MINIAOD',
                             #'/DoubleMuon/Run2016C-03Feb2017-v1/MINIAOD',
                             #'/DoubleMuon/Run2016D-03Feb2017-v1/MINIAOD',
                             #'/DoubleMuon/Run2016E-03Feb2017-v1/MINIAOD',
@@ -136,7 +136,7 @@ def main():
                             #'/Charmonium/Run2016C-03Feb2017-v1/MINIAOD',
                             #'/Charmonium/Run2016D-03Feb2017-v1/MINIAOD',
                             #'/Charmonium/Run2016E-03Feb2017-v1/MINIAOD',
-                            #'/Charmonium/Run2016F-03Feb2017-v1/MINIAOD',
+                            '/Charmonium/Run2016F-03Feb2017-v1/MINIAOD',
                             #'/Charmonium/Run2016G-03Feb2017-v1/MINIAOD',
                             #'/Charmonium/Run2016H-03Feb2017_ver2-v1/MINIAOD',
                             #'/Charmonium/Run2016H-03Feb2017_ver3-v1/MINIAOD',
