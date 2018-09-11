@@ -67,7 +67,7 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = '2017_mc'
+        config.General.workArea = 'mc_2017'
         config.General.transferOutputs = True
         config.General.transferLogs = False
 
@@ -83,10 +83,10 @@ def main():
         config.Data.splitting = 'EventAwareLumiBased'
         #config.Data.unitsPerJob = 5000
         #config.Data.totalUnits = 1000000
-        config.Data.unitsPerJob = 50000
-        #config.Data.unitsPerJob = 10000
+        #config.Data.unitsPerJob = 50000
+        config.Data.unitsPerJob = 10000
         config.Data.outputDatasetTag = None
-        config.Data.outLFNDirBase = '/store/user/%s/2017_mc/' % (getUsernameFromSiteDB())
+        config.Data.outLFNDirBase = '/store/user/%s/mc_2017/' % (getUsernameFromSiteDB())
 
         config.Site.storageSite = 'T3_US_FNALLPC' # Choose your site. 
         #--------------------------------------------------------
@@ -94,7 +94,8 @@ def main():
         # Will submit one task for each of these input datasets.
         inputDatasets = [
 
-                            '/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM',
+                            #'/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM',
+                            '/HToUpsilon1SG_ToMuMuG_allProdMode_M125_TuneCUETP8M1_13TeV_Pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v3/MINIAODSIM',
                         
                         ]
 

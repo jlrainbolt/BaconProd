@@ -67,7 +67,7 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = '2017_data'
+        config.General.workArea = 'data_2017'
         config.General.transferOutputs = True
         config.General.transferLogs = False
 
@@ -88,7 +88,7 @@ def main():
         #config.Data.totalUnits = 1000000
         #config.Data.unitsPerJob = 1
         config.Data.outputDatasetTag = None
-        config.Data.outLFNDirBase = '/store/user/%s/2017_data/' % (getUsernameFromSiteDB())
+        config.Data.outLFNDirBase = '/store/user/%s/data_2017/' % (getUsernameFromSiteDB())
 
         config.Site.storageSite = 'T3_US_FNALLPC' # Choose your site. 
         #--------------------------------------------------------
