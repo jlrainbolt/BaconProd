@@ -136,17 +136,15 @@ setupEgammaPostRecoSeq(process,
 
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-runMetCorAndUncFromMiniAOD (
-        process,
-        isData=is_data_flag, # false for MC
-        manualJetConfig=True,
-        jetCorLabelL3="ak4chsL1FastL2L3Corrector",
-        jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
-        reclusterJets=True,
-        recoMetFromPFCs=True,
-        fixEE2017=True,
-        postfix="ModifiedMET"
-)
+runMetCorAndUncFromMiniAOD(process,
+                           isData=is_data_flag,
+                           manualJetConfig=True,
+                           jetCorLabelL3="ak4chsL1FastL2L3Corrector",
+                           jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
+                           reclusterJets=True,
+                           recoMetFromPFCs=True,
+                           postfix="V2"
+                           )
 
 # PUPPI Woof Woof
 from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
@@ -236,7 +234,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     #edmPileupInfoName    = cms.untracked.string('addPileupInfo'),
     edmBeamspotName      = cms.untracked.string('offlineBeamSpot'),
     edmMETName           = cms.untracked.string('slimmedMETs'),
-    edmPFMETName         = cms.untracked.InputTag('slimmedMETsModifiedMET','','MakingBacon'),
+    #edmPFMETName         = cms.untracked.InputTag('slimmedMETs')
+    edmPFMETName         = cms.untracked.InputTag('slimmedMETsV2','','MakingBacon'),
     edmMVAMETName        = cms.untracked.string(''),
     edmPuppETName        = cms.untracked.InputTag('slimmedMETsPuppi'),
     edmAlpacaMETName     = cms.untracked.string(alpacaMet),
@@ -749,8 +748,8 @@ process.baconSequence = cms.Sequence(
                                      process.patJetCorrFactors*
                                      process.updatedPatJets*
                                      process.btagging *                  
-                                     process.fullPatMetSequencePuppi  *
-                                     process.fullPatMetSequenceModifiedMET *
+                                     process.fullPatMetSequenceV2*     
+                                     #process.fullPatMetSequencePuppi * 
                                      process.patJetCorrFactorsTransientCorrected*
                                      process.updatedPatJetsTransientCorrected*
                                      process.selectedUpdatedPatJets*

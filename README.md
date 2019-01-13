@@ -1,33 +1,27 @@
 BaconProd
 =========
 
-Package for producing bacon files
+Branch for producing bacon ntuples of 2016 legacy data and MC
 
- * Run on CMS LPC
- * CMSSW_9_4_9_cand2
- * Depends on NWUHEP/BaconAna jbueghly_2017 branch
+ * "Runs" on CMS LPC
+ * Uses CMSSW_9_4_12
+ * Depends on NWUHEP/BaconAna 2016legacy branch
 
-All objects are declared in BaconAna and filled in BaconProd/Ntupler, see e.g.:
-
-[TJet for Jets](https://github.com/NWUHEP/BaconAna/tree/jbueghly_2017/DataFormats/interface/TJet.hh)
-
-[FillerJet for Jets](https://github.com/NWUHEP/BaconProd/tree/jbueghly_2017/Ntupler/src/FillerJet.cc)
 
 Recipe for setup and running:
 
 ```Shell
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 export SCRAM_ARCH=slc6_amd64_gcc630
-cmsrel CMSSW_9_4_9_cand2
-cd CMSSW_9_4_9_cand2/src
+cmsrel CMSSW_9_4_12
+cd CMSSW_9_4_12/src
 cmsenv
 git cms-init
+git clone -b 2016legacy git@github.com:NWUHEP/BaconAna
+git clone -b 2016legacy git@github.com:NWUHEP/BaconProd
+git cms-merge-topic cms-egamma:EgammaID_949
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
-git cms-merge-topic cms-met:METFixEE2017_949
-git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconAna
-git clone -b jbueghly_2017 git@github.com:NWUHEP/BaconProd
-tar -xzvf /uscms/home/jbueghly/nobackup/bacon/bacon_2017_prod/jbueghly_2017/CMSSW_9_4_9_cand2/src/jbueghly_2017_depends.tar.gz 
-scram b clean
+git cms-merge-topic lathomas:L1Prefiring_9_4_9
 scram b -j 12
 ```
 

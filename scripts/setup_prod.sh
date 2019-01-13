@@ -1,16 +1,18 @@
 #!/bin/bash
 
 if test -z $CMSSW_VERSION; then
-  echo "[BaconProd] Need CMSSW project area setup!";
-  echo
-  return 0;
+    echo "[BaconProd] Need CMSSW project area setup!";
+    echo
+    return 0;
 fi
 
 CURRDIR=$PWD
-PATCHDIR=/afs/cern.ch/work/c/cmantill/public/94x/
 cd $CMSSW_BASE/src
 
-cp -r ${PATCHDIR}/* ./
+git cms-init
+git cms-merge-topic cms-egamma:EgammaID_949
+git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
+git cms-merge-topic lathomas:L1Prefiring_9_4_9
 
 echo
 echo "[BaconProd] Setup complete!"

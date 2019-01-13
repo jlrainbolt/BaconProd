@@ -11,9 +11,9 @@ do_alpaca     = False
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
-  process.GlobalTag.globaltag = cms.string('94X_dataRun2_ReReco_EOY17_v2')
+  process.GlobalTag.globaltag = cms.string('94X_dataRun2_v10')
 else:
-  process.GlobalTag.globaltag = cms.string('94X_mc2017_realistic_v10')
+  process.GlobalTag.globaltag = cms.string('94X_mcRun2_asymptotic_v3')
 
 #JEC
 JECTag='Fall17_17Nov2017_V6_MC'
@@ -23,16 +23,14 @@ if is_data_flag:
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
 if is_data_flag:
-  #process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
   process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
 else:
   process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
-#process.load('BaconProd/Ntupler/myQGLFromDB_cff')
+
 #--------------------------------------------------------------------------------
 # Import of standard configurations
 #================================================================================
 process.load('FWCore/MessageService/MessageLogger_cfi')
-#process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load('Configuration/StandardSequences/GeometryDB_cff')
 process.load('Configuration/StandardSequences/MagneticField_38T_cff')
 
@@ -107,10 +105,6 @@ process.load('RecoMET.METFilters.BadChargedCandidateFilter_cfi')
 process.BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
 
-# MVA MET
-#from BaconProd.Ntupler.myMVAMet_cff import setMiniAODMVAMet
-#process.load('BaconProd/Ntupler/myMVAMet_cff')     
-#setMiniAODMVAMet(process)
 #CHS
 process.chs = cms.EDFilter("CandPtrSelector",
                            src = cms.InputTag('packedPFCandidates'),
@@ -126,25 +120,25 @@ if is_data_flag:
   process.AK8QGTaggerSubJetsCHS.jec  = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
   process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
-# regression 
+# Egamma post-reco recipes
+# (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-                       runVID=False, #saves CPU time by not needlessly re-running VID
-                       era='2017-Nov17ReReco')
+                       runEnergyCorrections=False, # corrections by default are fine
+                       runVID=False, # if you want the Fall17V2 IDs, set this to True or remove
+                       era='2016-Legacy')  
 
 # PF MET corrections
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-runMetCorAndUncFromMiniAOD (
-        process,
-        isData=is_data_flag, # false for MC
-        manualJetConfig=True,
-        jetCorLabelL3="ak4chsL1FastL2L3Corrector",
-        jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
-        reclusterJets=True,
-        recoMetFromPFCs=True,
-        fixEE2017=True,
-        postfix="ModifiedMET"
-)
+runMetCorAndUncFromMiniAOD(process,
+                           isData=is_data_flag,
+                           manualJetConfig=True,
+                           jetCorLabelL3="ak4chsL1FastL2L3Corrector",
+                           jetCorLabelRes="ak4chsL1FastL2L3ResidualCorrector",
+                           reclusterJets=True,
+                           recoMetFromPFCs=True,
+                           postfix="V2"
+                           )
 
 # PUPPI Woof Woof
 from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
@@ -187,17 +181,23 @@ if do_alpaca:
   alpacaMet      = ('pfMetAlpacaData'        if is_data_flag else 'pfMetAlpacaMC' )
   alpacaPuppiMet = ('pfMetPuppiAlpacaData'   if is_data_flag else 'pfMetPuppiAlpacaMC' ) 
 
+# Level 1 ECAL prefiring fix
+# (https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe)
+process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
+                                ThePhotons = cms.InputTag("slimmedPhotons"),
+                                TheJets = cms.InputTag("slimmedJets"),
+                                L1Maps = cms.string(cmssw_base+"/src/L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root"),
+                                DataEra = cms.string("2016BtoH"),
+                                UseJetEMPt = cms.bool(False),
+                                PrefiringRateSystematicUncty = cms.double(0.2)
+                                )
+
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 process.source = cms.Source("PoolSource",
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-4000_W-40_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/02DEA6C9-19B7-E611-B22D-A0000420FE80.root'),
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAOD/QCD_HT1000to1500_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/50000/EEF28E00-0CEA-E711-8257-02163E0160F1.root'),
-                            #fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAOD/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/94X_mc2017_realistic_v10-v1/20000/46FB5EDE-F708-E811-A50F-0025905C53A4.root')
-                            fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/90000/FEB3954C-4942-E811-8A09-008CFAC91A38.root')
-                            #fileNames = cms.untracked.vstring('file:test.root'),
-                            #skipEvents = cms.untracked.uint32(0),
+                            fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/270000/4C8E5D5B-47C7-E811-826C-0CC47A0AD48A.root')
 )
 
 process.source.inputCommands = cms.untracked.vstring("keep *",
@@ -222,32 +222,34 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
   TriggerObject     = cms.untracked.string("slimmedPatTrigger"),
   TriggerFile       = cms.untracked.string(hlt_filename),
   useAOD            = cms.untracked.bool(False),
-  outputName        = cms.untracked.string('Output.root'),
+  outputName        = cms.untracked.string('Output_MC.root'),
   edmPVName         = cms.untracked.string('offlineSlimmedPrimaryVertices'),
   edmGenRunInfoName = cms.untracked.string('generator'),
   
   Info = cms.untracked.PSet(
-    isActive             = cms.untracked.bool(True),
-    edmPFCandName        = cms.untracked.string('packedPFCandidates'),
-    edmPileupInfoName    = cms.untracked.string('slimmedAddPileupInfo'),
-    #edmPileupInfoName    = cms.untracked.string('addPileupInfo'),
-    edmBeamspotName      = cms.untracked.string('offlineBeamSpot'),
-    edmMETName           = cms.untracked.string('slimmedMETs'),
-    edmPFMETName         = cms.untracked.InputTag('slimmedMETsModifiedMET','','MakingBacon'),
-    edmMVAMETName        = cms.untracked.string(''),
-    edmPuppETName        = cms.untracked.InputTag('slimmedMETsPuppi'),
-    edmAlpacaMETName     = cms.untracked.string(alpacaMet),
-    edmPupAlpacaMETName  = cms.untracked.string(alpacaPuppiMet),
-    edmRhoForIsoName     = cms.untracked.string('fixedGridRhoFastjetAll'),
-    edmRhoForJetEnergy   = cms.untracked.string('fixedGridRhoFastjetAll'),
-    doFillMETFilters     = cms.untracked.bool(True),
-    doFillMET            = cms.untracked.bool(True)
+    isActive            = cms.untracked.bool(True),
+    edmPFCandName       = cms.untracked.string('packedPFCandidates'),
+    edmPileupInfoName   = cms.untracked.string('slimmedAddPileupInfo'),
+    edmBeamspotName     = cms.untracked.string('offlineBeamSpot'),
+    edmMETName          = cms.untracked.string('slimmedMETs'),
+    edmPFMETName        = cms.untracked.InputTag('slimmedMETsV2','','MakingBacon'),
+    edmMVAMETName       = cms.untracked.string(''),
+    edmPuppETName       = cms.untracked.InputTag('slimmedMETsPuppi','','MakingBacon'),
+    edmAlpacaMETName    = cms.untracked.string(alpacaMet),
+    edmPupAlpacaMETName = cms.untracked.string(alpacaPuppiMet),
+    edmRhoForIsoName    = cms.untracked.string('fixedGridRhoFastjetAll'),
+    edmRhoForJetEnergy  = cms.untracked.string('fixedGridRhoFastjetAll'),
+    doFillMETFilters    = cms.untracked.bool(True),
+    doFillMET           = cms.untracked.bool(True),
+    ecalWeightName      = cms.untracked.InputTag('prefiringweight:NonPrefiringProb'),
+    ecalWeightUpName    = cms.untracked.InputTag('prefiringweight:NonPrefiringProbUp'),
+    ecalWeightDownName  = cms.untracked.InputTag('prefiringweight:NonPrefiringProbDown'),
   ),
   
   GenInfo = cms.untracked.PSet(
     isActive            = ( cms.untracked.bool(False) if is_data_flag else cms.untracked.bool(True) ),
-    edmGenEventInfoName     = cms.untracked.string('generator'),
-    edmGenParticlesName     = cms.untracked.string('prunedGenParticles'),
+    edmGenEventInfoName = cms.untracked.string('generator'),
+    edmGenParticlesName = cms.untracked.string('prunedGenParticles'),
     edmGenPackParticlesName = cms.untracked.string('packedGenParticles'),
     fillAllGen          = cms.untracked.bool(True),
     fillLHEWeights      = cms.untracked.bool(True)
@@ -284,17 +286,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     useTriggerObject          = cms.untracked.bool(True),
     edmEcalPFClusterIsoMapTag = cms.untracked.InputTag('electronEcalPFClusterIsolationProducer'),
     edmHcalPFClusterIsoMapTag = cms.untracked.InputTag('electronHcalPFClusterIsolationProducer'),
-    #----------------------    SETTINGS FOR 2016 (8X)     -----------------------
-    #edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90'),
-    #edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80'),
-    #edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
-    #edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories')
-    #storeSecondMVA            = cms.untracked.bool(False),
-    #edmEleMediumIdMapTag      = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90'),
-    #edmEleTightIdMapTag       = cms.untracked.InputTag('egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80'),
-    #edmMVAValuesTag           = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Values'),
-    #edmMVACatsTag             = cms.untracked.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16GeneralPurposeV1Categories')
-    #----------------------    SETTINGS FOR 2017 (9X)     -----------------------
     storeSecondMVA            = cms.untracked.bool(True),
     fillVertices              = cms.untracked.bool(True)
   ),
@@ -319,9 +310,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmChHadIsoMapTag     = cms.untracked.InputTag("photonIDValueMapProducer:phoChargedIsolation"),        # EGM recommendation not in AOD/MINIAOD
     edmNeuHadIsoMapTag    = cms.untracked.InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"),  # EGM recommendation not in AOD/MINIAOD
     edmGammaIsoMapTag     = cms.untracked.InputTag("photonIDValueMapProducer:phoPhotonIsolation"),          # EGM recommendation not in AOD/MINIAOD
-    #FOR 2016 (8X)
-    #edmPhoMVAIdTag        = cms.untracked.InputTag("photonMVAValueMapProducer:PhotonMVAEstimatorRun2Spring16NonTrigV1Values"),
-    #FOR 2017 (8X)
     useTriggerObject      = cms.untracked.bool(True),
   ),
   
@@ -356,7 +344,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     BRegNNStd               = cms.untracked.double(0.39077115058898926),
 
     # names of various jet-related collections
-    jetName              = cms.untracked.string('selectedUpdatedPatJets'),#selectedUpdatedPatJets'),#updatedPatJetsTransientCorrected'),#updatedPatJets'),#slimmedJets'),
+    jetName              = cms.untracked.string('selectedUpdatedPatJets'),
     genJetName           = cms.untracked.string('slimmedGenJets'),
     csvBTagName          = cms.untracked.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     mvaBTagName          = cms.untracked.string('pfCombinedMVAV2BJetTags'),
@@ -457,7 +445,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmRhoName  = cms.untracked.string('fixedGridRhoFastjetAll'),
 
     # names of various jet-related collections
-    #jetName              = cms.untracked.string('slimmedJetsAK8'),
     jetName              = cms.untracked.string('AK8PFJetsCHS'),
     genJetName           = cms.untracked.string('AK8GenJetsCHS'),
     jetFlavorName        = cms.untracked.string('AK8FlavorCHS'),
@@ -509,6 +496,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     jecUncName  = (cms.untracked.string('AK8chs')),
     edmRhoName  = cms.untracked.string('fixedGridRhoFastjetAll'),
     showerDecoConf       = cms.untracked.string(''),
+
     # names of various jet-related collections
     jetName              = cms.untracked.string('CA8PFJetsCHS'),
     genJetName           = cms.untracked.string('CA8GenJetsCHS'),
@@ -558,7 +546,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     showerDecoConf       = cms.untracked.string(''),
     edmRhoName  = cms.untracked.string('fixedGridRhoFastjetAll'),
     
-    # ORDERD list of pileup jet ID input files
+    # ORDERED list of pileup jet ID input files
     jetPUIDFiles = cms.untracked.vstring('',
                                          'BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
     jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
@@ -617,7 +605,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     jecName     = (cms.untracked.string('ak8chsL1FastL2L3ResidualCorrector') if is_data_flag else cms.untracked.string('ak8chsL1FastL2L3Corrector') ),
     jecUncName  = (cms.untracked.string('AK8chs')),
     edmRhoName  = cms.untracked.string('fixedGridRhoFastjetAll'),
-    # ORDERD list of pileup jet ID input files
+
+    # ORDERED list of pileup jet ID input files
     jetPUIDFiles = cms.untracked.vstring('',
                                          'BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
     jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
@@ -675,7 +664,8 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     jecName     = (cms.untracked.string('ak8PuppiL1FastL2L3ResidualCorrector') if is_data_flag else cms.untracked.string('ak8PuppiL1FastL2L3Corrector') ),
     jecUncName  = (cms.untracked.string('AK8Puppi')),
     edmRhoName  = cms.untracked.string('fixedGridRhoFastjetAll'),
-    # ORDERD list of pileup jet ID input files
+
+    # ORDERED list of pileup jet ID input files
     jetPUIDFiles = cms.untracked.vstring('',
                                          'BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
     jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),    
@@ -683,6 +673,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     BRegNNMean              = cms.untracked.double(1.0610932111740112),
     BRegNNStd               = cms.untracked.double(0.39077115058898926),
     showerDecoConf     = cms.untracked.string(''),
+
     # names of various jet-related collections
     jetName            = cms.untracked.string('CA15PFJetsPuppi'),
     genJetName         = cms.untracked.string('slimmedGenJetsAK8'),
@@ -729,29 +720,29 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 )
 
 process.baconSequence = cms.Sequence(
-                                     #process.pfCleaned*
-                                     process.BadPFMuonFilter          *
-                                     process.BadChargedCandidateFilter*
-                                     process.ak4chsL1FastL2L3Chain    *
-                                     process.ak4PuppiL1FastL2L3Chain  *
-                                     process.ak8PuppiL1FastL2L3Chain  *
-                                     process.pfNoPileUpJME            *
-                                     process.egammaPostRecoSeq        *
-                                     process.puppiMETSequence          *
-                                     process.genjetsequence            *
-                                     process.AK4genjetsequenceCHS      *
-                                     process.AK4jetsequencePuppi       *
-                                     process.AK8jetsequencePuppi       *
-                                     process.CA15jetsequencePuppi      *
-                                     process.patJetCorrFactors*
-                                     process.updatedPatJets*
-                                     process.btagging *                  
-                                     process.fullPatMetSequencePuppi  *
-                                     process.fullPatMetSequenceModifiedMET *
+                                     process.BadPFMuonFilter                    *
+                                     process.BadChargedCandidateFilter          *
+                                     process.ak4chsL1FastL2L3Chain              *
+                                     process.ak4PuppiL1FastL2L3Chain            *
+                                     process.ak8PuppiL1FastL2L3Chain            *
+                                     process.pfNoPileUpJME                      *
+                                     process.egammaPostRecoSeq                  *
+                                     process.puppiMETSequence                   *
+                                     process.genjetsequence                     *
+                                     process.AK4genjetsequenceCHS               *
+                                     process.AK4jetsequencePuppi                *
+                                     process.AK8jetsequencePuppi                *
+                                     process.CA15jetsequencePuppi               *
+                                     process.patJetCorrFactors                  *
+                                     process.updatedPatJets                     *
+                                     process.btagging                           *                  
+                                     process.fullPatMetSequencePuppi            *
+                                     process.fullPatMetSequenceV2               *     
                                      process.patJetCorrFactorsTransientCorrected*
-                                     process.updatedPatJetsTransientCorrected*
-                                     process.selectedUpdatedPatJets*
-                                     process.QGTagger              *
+                                     process.updatedPatJetsTransientCorrected   *
+                                     process.selectedUpdatedPatJets             *
+                                     process.QGTagger                           *
+                                     process.prefiringweight                    *
                                      process.ntupler
                                      )
 
@@ -780,9 +771,3 @@ if is_data_flag:
   assert process.ntupler.AK4CHS.doGenJet  == cms.untracked.bool(False)
   assert process.ntupler.CA8CHS.doGenJet  == cms.untracked.bool(False)
   assert process.ntupler.CA15CHS.doGenJet == cms.untracked.bool(False)
-
-
-#process.out = cms.OutputModule("PoolOutputModule",                                                                                                                                                   
-#                                  outputCommands = cms.untracked.vstring('keep *'),                                                                                                                   #                                  fileName       = cms.untracked.string ("test_output.root")                                                                                                          #          
-#                                  )   
-#process.endpath = cms.EndPath(process.out)
