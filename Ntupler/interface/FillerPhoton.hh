@@ -65,6 +65,7 @@ namespace baconhep
       
       // EDM object collection names
       std::string fPhotonName;
+      edm::InputTag fPatPhotonName;
       std::string fPFCandName;
       std::string fBSName;
       std::string fEleName;

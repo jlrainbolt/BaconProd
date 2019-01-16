@@ -715,24 +715,26 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
     //
     // l1 ecal prefiring weight
     //==============================
+    if(!iEvent.isRealData())
+    {
+        // Non-prefiring probability
+        edm::Handle<double> hPrefWeight;
+        iEvent.getByToken(fTokPrefWeight, hPrefWeight);
+        assert(hPrefWeight.isValid());
+        evtInfo->ecalWeight = *hPrefWeight;
 
-    // Non-prefiring probability
-    edm::Handle<double> hPrefWeight;
-    iEvent.getByToken(fTokPrefWeight, hPrefWeight);
-    assert(hPrefWeight.isValid());
-    evtInfo->ecalWeight = *hPrefWeight;
+        // Plus one sigma (20%)
+        edm::Handle<double> hPrefWeightUp;
+        iEvent.getByToken(fTokPrefWeightUp, hPrefWeightUp);
+        assert(hPrefWeightUp.isValid());
+        evtInfo->ecalWeightUp = *hPrefWeightUp;
 
-    // Plus one sigma (20%)
-    edm::Handle<double> hPrefWeightUp;
-    iEvent.getByToken(fTokPrefWeightUp, hPrefWeightUp);
-    assert(hPrefWeightUp.isValid());
-    evtInfo->ecalWeightUp = *hPrefWeightUp;
-
-    // Mius one sigma (20%)
-    edm::Handle<double> hPrefWeightDown;
-    iEvent.getByToken(fTokPrefWeightDown, hPrefWeightDown);
-    assert(hPrefWeightDown.isValid());
-    evtInfo->ecalWeightDown = *hPrefWeightDown;
+        // Mius one sigma (20%)
+        edm::Handle<double> hPrefWeightDown;
+        iEvent.getByToken(fTokPrefWeightDown, hPrefWeightDown);
+        assert(hPrefWeightDown.isValid());
+        evtInfo->ecalWeightDown = *hPrefWeightDown;
+    }
 }
 
 void FillerEventInfo::computeTrackMET(const unsigned int ipv,

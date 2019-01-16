@@ -88,7 +88,6 @@ namespace baconhep
       edm::InputTag fHcalPFClusterIsoMapTag;
       edm::InputTag fEleMediumIdMapTag;
       edm::InputTag fEleTightIdMapTag;
-      bool fSecondMVA;
       bool fUseTO;
       bool fFillVertices;
       bool fUseAOD;

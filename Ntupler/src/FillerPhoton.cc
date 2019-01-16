@@ -26,6 +26,7 @@ using namespace baconhep;
 FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,edm::ConsumesCollector && iC):
   fMinPt             (iConfig.getUntrackedParameter<double>("minPt",10)),
   fPhotonName        (iConfig.getUntrackedParameter<std::string>("edmName","gedPhotons")),
+  fPatPhotonName     (iConfig.getUntrackedParameter<edm::InputTag>("edmInputTag")),
   fPFCandName        (iConfig.getUntrackedParameter<std::string>("edmPFCandName","particleFlow")),
   fBSName            (iConfig.getUntrackedParameter<std::string>("edmBeamspotName","offlineBeamSpot")),
   fEleName           (iConfig.getUntrackedParameter<std::string>("edmElectronName","gedGsfElectrons")),
@@ -38,7 +39,7 @@ FillerPhoton::FillerPhoton(const edm::ParameterSet &iConfig, const bool useAOD,e
   fUseAOD            (useAOD)
 {
   if(fUseAOD)  fTokPhotonName    =  iC.consumes<reco::PhotonCollection>     (fPhotonName);
-  if(!fUseAOD) fTokPatPhotonName =  iC.consumes<pat::PhotonCollection>      (fPhotonName);
+  if(!fUseAOD) fTokPatPhotonName =  iC.consumes<pat::PhotonCollection>      (fPatPhotonName);
   fTokPFCandName =  iC.consumes<reco::PFCandidateCollection>(fPFCandName);
   fTokBSName     =  iC.consumes<reco::BeamSpot>             (fBSName);
   fTokEleName    =  iC.consumes<reco::GsfElectronCollection>(fEleName);
@@ -56,8 +57,8 @@ FillerPhoton::~FillerPhoton(){}
 // === filler for AOD ===
 void FillerPhoton::fill(TClonesArray *array, 
                         const edm::Event &iEvent, const edm::EventSetup &iSetup,
-		        const std::vector<TriggerRecord> &triggerRecords,
-		        const trigger::TriggerEvent &triggerEvent)
+                const std::vector<TriggerRecord> &triggerRecords,
+                const trigger::TriggerEvent &triggerEvent)
 {
   assert(array);
 //  if(!fPhotonReg->IsInitialized()) { 
@@ -165,7 +166,7 @@ void FillerPhoton::fill(TClonesArray *array,
 //    pPhoton->chHadIso03SelVtx  = -1;
 //    pPhoton->chHadIso03WstVtx  = -1;
 //    computeVtxIso(*itPho,*pfCandCol,*vtxCol,
-//		  pPhoton->chHadIso03SelVtx,pPhoton->chHadIso03WstVtx);
+//        pPhoton->chHadIso03SelVtx,pPhoton->chHadIso03WstVtx);
 
 
     //
@@ -197,7 +198,7 @@ void FillerPhoton::fill(TClonesArray *array,
       scIndex++;
       if(itPho->superCluster().get() == &(*itSC)) {
         pPhoton->scID = scIndex;
-	break;
+    break;
       }
     }
     
@@ -337,8 +338,8 @@ void FillerPhoton::fill(TClonesArray *array,
     pPhoton->isConv           = !itPho->passElectronVeto();
     pPhoton->passElectronVeto = itPho->passElectronVeto(); // here for backwards compatibility
 
-    pPhoton->mva = itPho->userFloat("PhotonMVAEstimatorRunIIFall17v1Values");
-    pPhoton->mvaCat = itPho->userInt("PhotonMVAEstimatorRunIIFall17v1Categories");
+    pPhoton->mva = itPho->userFloat("PhotonMVAEstimatorRun2Spring16NonTrigV1Values");
+    pPhoton->mvaCat = itPho->userInt("PhotonMVAEstimatorRun2Spring16NonTrigV1Categories");
 
     if(fUseTO) pPhoton->hltMatchBits = TriggerTools::matchHLT(pPhoton->eta, pPhoton->phi, triggerRecords, triggerObjects);
   }
@@ -346,9 +347,9 @@ void FillerPhoton::fill(TClonesArray *array,
 /*
 //--------------------------------------------------------------------------------------------------
 void FillerPhoton::computeVtxIso(const reco::Photon &photon,
-				 const std::vector<reco::PFCandidate>        &pf,
-				 const std::vector<reco::Vertex>             &iVertex,
-				 float &out_chHadIsoWvtx,float &out_chHadIsoFirstVtx) const 
+                 const std::vector<reco::PFCandidate>        &pf,
+                 const std::vector<reco::Vertex>             &iVertex,
+                 float &out_chHadIsoWvtx,float &out_chHadIsoFirstVtx) const 
 {
   double extRadius = 0.3;
   double intRadius = 0.02;
@@ -361,8 +362,8 @@ void FillerPhoton::computeVtxIso(const reco::Photon &photon,
       // Add p_T to running sum if PFCandidate is close enough
       TVector3 pVec; 
       pVec.SetXYZ(photon.superCluster()->position().x()-vertex.position().x(),
-		  photon.superCluster()->position().y()-vertex.position().y(),
-		  photon.superCluster()->position().z()-vertex.position().z());
+          photon.superCluster()->position().y()-vertex.position().y(),
+          photon.superCluster()->position().z()-vertex.position().z());
       
       double dr = reco::deltaR(pfcand.eta(), pfcand.phi(), pVec.Eta(), pVec.Phi());
       if(dr >= extRadius || dr < intRadius) continue;

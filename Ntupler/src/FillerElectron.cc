@@ -41,7 +41,6 @@ FillerElectron::FillerElectron(const edm::ParameterSet &iConfig, const bool useA
   fUsePuppi              (iConfig.getUntrackedParameter<bool>("usePuppi",true)),
   fEcalPFClusterIsoMapTag(iConfig.getUntrackedParameter<edm::InputTag>("edmEcalPFClusterIsoMapTag")),
   fHcalPFClusterIsoMapTag(iConfig.getUntrackedParameter<edm::InputTag>("edmHcalPFClusterIsoMapTag")),
-  fSecondMVA             (iConfig.getUntrackedParameter<bool>("storeSecondMVA",false)),
   fUseTO                 (iConfig.getUntrackedParameter<bool>("useTriggerObject",false)),
   fFillVertices          (iConfig.getUntrackedParameter<bool>("fillVertices",false)),
   fUseAOD                (useAOD)
@@ -246,7 +245,6 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->dEtaIn     = itEle->deltaEtaSuperClusterTrackAtVtx();
     pElectron->dPhiIn     = itEle->deltaPhiSuperClusterTrackAtVtx();
     
-    pElectron->mva = -999;
     pElectron->isConv = ConversionTools::hasMatchedConversion(*itEle, hConvProduct, bs->position(), true, 2.0, 1e-6, 0);
     
     if(gsfTrack.isNonnull()) {
@@ -363,21 +361,19 @@ void FillerElectron::fill(TClonesArray *array,
     //
     // Kinematics
     //==============================
-    pElectron->pt         = itEle->pt();
-    pElectron->regscale   = itEle->ecalRegressionScale();
-    pElectron->regsmear   = itEle->ecalRegressionSmear();
-    pElectron->eta        = itEle->eta();
-    pElectron->phi        = itEle->phi();
-    pElectron->q          = itEle->charge();
-    pElectron->isCC       = itEle->isGsfCtfScPixChargeConsistent();
-    pElectron->ecalEnergy = itEle->ecalEnergy();
-    pElectron->scEt       = (sc->energy())*(sc->position().Rho())/(sc->position().R());
-    pElectron->scEta      = sc->eta();
-    pElectron->scPhi      = sc->phi();
-
-    auto corrP4 = itEle->p4() * itEle->userFloat("ecalTrkEnergyPostCorr") / itEle->energy();
-    pElectron->calibPt = corrP4.Pt();
-    pElectron->calibE = corrP4.E();
+    pElectron->pt           = itEle->pt();
+    pElectron->regscale     = itEle->ecalRegressionScale();
+    pElectron->regsmear     = itEle->ecalRegressionSmear();
+    pElectron->eta          = itEle->eta();
+    pElectron->phi          = itEle->phi();
+    pElectron->et           = itEle->et();
+    pElectron->energy       = itEle->energy();
+    pElectron->q            = itEle->charge();
+    pElectron->isCC         = itEle->isGsfCtfScPixChargeConsistent();
+    pElectron->ecalEnergy   = itEle->ecalEnergy();
+    pElectron->scEt         = (sc->energy())*(sc->position().Rho())/(sc->position().R());
+    pElectron->scEta        = sc->eta();
+    pElectron->scPhi        = sc->phi();
 
     pElectron->pfPt  = 0;
     pElectron->pfEta = 0;
@@ -457,13 +453,17 @@ void FillerElectron::fill(TClonesArray *array,
     pElectron->dEtaIn     = itEle->deltaEtaSuperClusterTrackAtVtx();
     pElectron->dPhiIn     = itEle->deltaPhiSuperClusterTrackAtVtx();
 
-    pElectron->mva = itEle->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV1Values");
-    pElectron->mvaCat = itEle->userInt("ElectronMVAEstimatorRun2Fall17NoIsoV1Categories");
-
-    if (fSecondMVA) {
-        pElectron->mvaIso = itEle->userFloat("ElectronMVAEstimatorRun2Fall17IsoV1Values");
-        pElectron->mvaIsoCat = itEle->userInt("ElectronMVAEstimatorRun2Fall17IsoV1Categories");
-    }
+    //
+    // MVA identification
+    //==============================
+    pElectron->mva2016HZZ       = itEle->userFloat("ElectronMVAEstimatorRun2Spring16HZZV1Values");
+    pElectron->cat2016HZZ       = itEle->userInt("ElectronMVAEstimatorRun2Spring16HZZV1Categories");
+    pElectron->pass2016HZZwpLoose = itEle->electronID("mvaEleID-Spring16-HZZ-V1-wpLoose");
+    pElectron->mva2017isoV2     = itEle->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+    pElectron->cat2017isoV2     = itEle->userInt("ElectronMVAEstimatorRun2Fall17IsoV2Categories");
+    pElectron->pass2017isoV2wpHZZ = itEle->electronID("mvaEleID-Fall17-iso-V2-wpHZZ");
+    pElectron->mva2017noIsoV2   = itEle->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
+    pElectron->cat2017noIsoV2   = itEle->userInt("ElectronMVAEstimatorRun2Fall17NoIsoV2Categories");
 
     pElectron->isConv     = !itEle->passConversionVeto();
 
@@ -488,6 +488,19 @@ void FillerElectron::fill(TClonesArray *array,
     if(itEle->isEERingGap()) pElectron->fiducialBits |= kIsEERingGap;
 
     pElectron->classification = itEle->classification();
+
+
+    //
+    // Energy scaling/smearing
+    //==============================
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaMiniAODV2#Energy_Scale_and_Smearing
+    pElectron->ecalTrkEnergyPreCorr     = itEle->userFloat("ecalTrkEnergyPreCorr");
+    pElectron->ecalTrkEnergyPostCorr    = itEle->userFloat("ecalTrkEnergyPostCorr");
+    pElectron->energyScaleUp            = itEle->userFloat("energyScaleUp");
+    pElectron->energyScaleDown          = itEle->userFloat("energyScaleDown");
+    pElectron->energySigmaUp            = itEle->userFloat("energySigmaUp");
+    pElectron->energySigmaDown          = itEle->userFloat("energySigmaDown");
+
 
     // Obtain a supercluster ID, unique per event. The SC ID is the index in the SC collection.
     pElectron->scID = -1;
