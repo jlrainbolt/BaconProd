@@ -16,9 +16,11 @@ else:
     process.GlobalTag.globaltag = cms.string('94X_mcRun2_asymptotic_v3')
 
 #JEC
-JECTag='Fall17_17Nov2017_V6_MC'
-if is_data_flag: 
-    JECTag='Fall17_17Nov2017BCDEF_V6_DATA'
+#   Affected by FormulaEvaluator bug:
+#   https://hypernews.cern.ch/HyperNews/CMS/get/jes/770.html
+JECTag='Summer16_07Aug2017_V11_MC'
+if is_data_flag:
+    JECTag='Summer16_07Aug2017All_V11_DATA'
 
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
@@ -121,14 +123,15 @@ if is_data_flag:
     process.CA15QGTaggerSubJetsCHS.jec = cms.InputTag("ak8chsL1FastL2L3ResidualCorrector")
 
 # Egamma post-reco recipes
-# (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
+#   (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-        runEnergyCorrections=False,  # corrections by default are fine
-        runVID=True,                 # get Fall17V2 IDs
+        runEnergyCorrections=False,  # corrections by default are fine for 2016 legacy
+        runVID=True,                 # get Fall17V2 IDs, which "breaks" photons
         era='2016-Legacy')
 
 # PF MET corrections
+#   Needs old-style (i.e. not post-VID) photons associated with ValueMaps
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD(process,
         isData=is_data_flag,
@@ -142,6 +145,7 @@ runMetCorAndUncFromMiniAOD(process,
         )
 
 # PUPPI Woof Woof
+#   Needs old-style (i.e. not post-VID) photons associated with ValueMaps
 from PhysicsTools.PatAlgos.slimming.puppiForMET_cff import makePuppiesFromMiniAOD
 makePuppiesFromMiniAOD (process, True )
 runMetCorAndUncFromMiniAOD(process,
@@ -157,6 +161,8 @@ runMetCorAndUncFromMiniAOD(process,
         reclusterJets=True,
         postfix="Puppi"
         )
+# These bools according to recipe from
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Puppi_MET
 process.puppiNoLep.useExistingWeights = False
 process.puppi.useExistingWeights = False
 
