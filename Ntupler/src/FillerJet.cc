@@ -84,7 +84,7 @@ FillerJet::FillerJet(const edm::ParameterSet &iConfig, const bool useAOD,edm::Co
   fBoostedDoubleSVTagInfoName (iConfig.getUntrackedParameter<std::string>("boostedDoubleSVTagInfoName","AK8PFBoostedDoubleSVTagInfosCHS")),
   fDeepDoubleBtagName (iConfig.getUntrackedParameter<std::string>("deepDoubleBTagName","AK8PFBoostedDeepDoubleBJetTagsCHS:probH")),
   fDeepDoubleBNoMassSculptPentagName (iConfig.getUntrackedParameter<std::string>("deepDoubleBNoMassSculptPenTagName","AK8PFBoostedDeepDoubleBNoMassSculptPenJetTagsCHS:probH")),
-  fBRegNNFile         (iConfig.getUntrackedParameter<std::string>("BRegNNFileName","BaconProd/Utils/data/breg_training_2017.pb")),
+  fBRegNNFile         (iConfig.getUntrackedParameter<std::string>("BRegNNFileName","BaconProd/Utils/data/breg_training_2016_updated.pb")),
   fBRegNNMean         (iConfig.getUntrackedParameter<double>("BRegNNMean",1.0610932111740112)),
   fBRegNNStd          (iConfig.getUntrackedParameter<double>("BRegNNStd",0.39077115058898926)),
   //fMuonName           (iConfig.getUntrackedParameter<std::string>("edmMuonName","muons")),

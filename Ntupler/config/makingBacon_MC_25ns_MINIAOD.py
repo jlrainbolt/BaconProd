@@ -210,8 +210,7 @@ process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/270000/4C8E5D5B-47C7-E811-826C-0CC47A0AD48A.root')
         )
 
-process.source.inputCommands = cms.untracked.vstring("keep *",
-        "drop *_MEtoEDMConverter_*_*")
+process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
 # Reporting
@@ -349,7 +348,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 jecName         = (cms.untracked.string('ak4chsL1FastL2L3ResidualCorrector') if is_data_flag else cms.untracked.string('ak4chsL1FastL2L3Corrector') ),
                 jecUncName      = (cms.untracked.string('AK4chs')),
                 edmRhoName      = cms.untracked.string('fixedGridRhoFastjetAll'),
-                BRegNNFileName  = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),
+                BRegNNFileName  = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),
                 BRegNNMean      = cms.untracked.double(1.0610932111740112),
                 BRegNNStd       = cms.untracked.double(0.39077115058898926),
 
@@ -390,7 +389,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 # ORDERD list of pileup jet ID input files
                 jetPUIDFiles = cms.untracked.vstring('','BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
                 jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
-                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),
+                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),
                 BRegNNMean              = cms.untracked.double(1.0610932111740112),
                 BRegNNStd               = cms.untracked.double(0.39077115058898926),
                 # names of various jet-related collections
@@ -443,7 +442,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 showerDecoConf          = cms.untracked.string(''),
                 jetPUIDFiles            = cms.untracked.vstring('','BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
                 jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
-                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),
+                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),
                 BRegNNMean              = cms.untracked.double(1.0610932111740112),
                 BRegNNStd               = cms.untracked.double(0.39077115058898926),
 
@@ -558,7 +557,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 jetPUIDFiles = cms.untracked.vstring('',
                     'BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
                 jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
-                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),
+                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),
                 BRegNNMean              = cms.untracked.double(1.0610932111740112),
                 BRegNNStd               = cms.untracked.double(0.39077115058898926),
 
@@ -618,7 +617,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 jetPUIDFiles = cms.untracked.vstring('',
                     'BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
                 jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),
-                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),
+                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),
                 BRegNNMean              = cms.untracked.double(1.0610932111740112),
                 BRegNNStd               = cms.untracked.double(0.39077115058898926),
 
@@ -677,7 +676,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 # ORDERED list of pileup jet ID input files
                 jetPUIDFiles = cms.untracked.vstring('','BaconProd/Utils/data/TMVAClassificationCategory_JetID_53X_chs_Dec2012.weights.xml'),
                 jetBoostedBtaggingFiles = cms.untracked.string('BaconProd/Utils/data/BoostedSVDoubleCA15_withSubjet_v4.weights.xml'),    
-                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2017.pb'),    
+                BRegNNFileName          = cms.untracked.string('BaconProd/Utils/data/breg_training_2016_updated.pb'),    
                 BRegNNMean              = cms.untracked.double(1.0610932111740112),
                 BRegNNStd               = cms.untracked.double(0.39077115058898926),
                 showerDecoConf          = cms.untracked.string(''),
