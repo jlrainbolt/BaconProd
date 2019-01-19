@@ -25,9 +25,9 @@ if is_data_flag:
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
 if is_data_flag:
-    process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+    process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 else:
-    process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+    process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -196,7 +196,7 @@ if do_alpaca:
 process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
         ThePhotons = cms.InputTag("slimmedPhotons",processName=cms.InputTag.skipCurrentProcess()),
         TheJets = cms.InputTag("slimmedJets"),
-        L1Maps = cms.string(cmssw_base+"/src/L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root"),
+        L1Maps = cms.string("src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
         DataEra = cms.string("2016BtoH"),
         UseJetEMPt = cms.bool(False),
         PrefiringRateSystematicUncty = cms.double(0.2)
@@ -205,6 +205,8 @@ process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
+# Workaround for file-based splitting of DY sample
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2500) )
 #process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring('')

@@ -70,6 +70,7 @@ namespace baconhep
             std::string     fRhoIsoName;
             std::string     fRhoJetName;
             bool fUseFilters;
+            bool fUseMET;
             bool fUseAOD;
             edm::InputTag   fPrefWeightName;
             edm::InputTag   fPrefWeightUpName;

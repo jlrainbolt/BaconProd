@@ -22,7 +22,6 @@ git clone -b 2016legacy git@github.com:jlrainbolt/BaconProd
 git cms-merge-topic lathomas:L1Prefiring_9_4_9
 git cms-merge-topic cms-egamma:EgammaID_949
 git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
-git cms-merge-topic lsoffi:CMSSW_9_4_0_pre3_TnP
 scram b -j 12
 ```
 

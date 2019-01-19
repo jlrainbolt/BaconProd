@@ -27,6 +27,7 @@ FillerEventInfo::FillerEventInfo(const edm::ParameterSet &iConfig, const bool us
     fRhoIsoName    (iConfig.getUntrackedParameter<std::string>("edmRhoForIsoName","fixedGridRhoFastjetAll")),
     fRhoJetName    (iConfig.getUntrackedParameter<std::string>("edmRhoForJetEnergy","fixedGridRhoFastjetAll")),
     fUseFilters    (iConfig.getUntrackedParameter<bool>("doFillMETFilters",true)),
+    fUseMET        (iConfig.getUntrackedParameter<bool>("doFillMET",true)),
     fUseAOD        (useAOD),
     fPrefWeightName     (iConfig.getUntrackedParameter<edm::InputTag>("ecalWeightName")),
     fPrefWeightUpName   (iConfig.getUntrackedParameter<edm::InputTag>("ecalWeightUpName")),
@@ -427,265 +428,268 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
     //
     // MET info
     //==============================
-    if(fUseAOD) {  // === AOD ===
-        // CaloMET
-        edm::Handle<reco::CaloMETCollection> hCaloMETProduct;
-        iEvent.getByToken(fTokCaloMETName,hCaloMETProduct);
-        assert(hCaloMETProduct.isValid());
-        const reco::CaloMET &inCaloMET = hCaloMETProduct.product()->front();
-        evtInfo->caloMET      = inCaloMET.pt();
-        evtInfo->caloMETphi   = inCaloMET.phi();
-        //evtInfo->caloMETCov00 = inCaloMET.getSignificanceMatrix()(0,0);
-        //evtInfo->caloMETCov01 = inCaloMET.getSignificanceMatrix()(0,1);
-        //evtInfo->caloMETCov11 = inCaloMET.getSignificanceMatrix()(1,1);
+    if(fUseMET)
+    {
+        if(fUseAOD) {  // === AOD ===
+            // CaloMET
+            edm::Handle<reco::CaloMETCollection> hCaloMETProduct;
+            iEvent.getByToken(fTokCaloMETName,hCaloMETProduct);
+            assert(hCaloMETProduct.isValid());
+            const reco::CaloMET &inCaloMET = hCaloMETProduct.product()->front();
+            evtInfo->caloMET      = inCaloMET.pt();
+            evtInfo->caloMETphi   = inCaloMET.phi();
+            //evtInfo->caloMETCov00 = inCaloMET.getSignificanceMatrix()(0,0);
+            //evtInfo->caloMETCov01 = inCaloMET.getSignificanceMatrix()(0,1);
+            //evtInfo->caloMETCov11 = inCaloMET.getSignificanceMatrix()(1,1);
 
-        // Raw PF MET
-        edm::Handle<reco::PFMETCollection> hPFMETProduct;
-        iEvent.getByToken(fTokPFMETName,hPFMETProduct);
-        assert(hPFMETProduct.isValid());
-        const reco::PFMET &inPFMET = hPFMETProduct.product()->front();
-        evtInfo->pfMET      = inPFMET.pt();
-        evtInfo->pfMETphi   = inPFMET.phi();
-        evtInfo->pfMETCov00 = inPFMET.getSignificanceMatrix()(0,0);
-        evtInfo->pfMETCov01 = inPFMET.getSignificanceMatrix()(0,1);
-        evtInfo->pfMETCov11 = inPFMET.getSignificanceMatrix()(1,1);
+            // Raw PF MET
+            edm::Handle<reco::PFMETCollection> hPFMETProduct;
+            iEvent.getByToken(fTokPFMETName,hPFMETProduct);
+            assert(hPFMETProduct.isValid());
+            const reco::PFMET &inPFMET = hPFMETProduct.product()->front();
+            evtInfo->pfMET      = inPFMET.pt();
+            evtInfo->pfMETphi   = inPFMET.phi();
+            evtInfo->pfMETCov00 = inPFMET.getSignificanceMatrix()(0,0);
+            evtInfo->pfMETCov01 = inPFMET.getSignificanceMatrix()(0,1);
+            evtInfo->pfMETCov11 = inPFMET.getSignificanceMatrix()(1,1);
 
-        // Corrected PF MET
-        edm::Handle<reco::PFMETCollection> hPFMETCProduct;
-        iEvent.getByToken(fTokPFMETCName,hPFMETCProduct);
-        assert(hPFMETCProduct.isValid());
-        const reco::PFMET &inPFMETC = hPFMETCProduct.product()->front();
-        evtInfo->pfMETC      = inPFMETC.pt();
-        evtInfo->pfMETCphi   = inPFMETC.phi();
-        evtInfo->pfMETCCov00 = inPFMETC.getSignificanceMatrix()(0,0);
-        evtInfo->pfMETCCov01 = inPFMETC.getSignificanceMatrix()(0,1);
-        evtInfo->pfMETCCov11 = inPFMETC.getSignificanceMatrix()(1,1);
+            // Corrected PF MET
+            edm::Handle<reco::PFMETCollection> hPFMETCProduct;
+            iEvent.getByToken(fTokPFMETCName,hPFMETCProduct);
+            assert(hPFMETCProduct.isValid());
+            const reco::PFMET &inPFMETC = hPFMETCProduct.product()->front();
+            evtInfo->pfMETC      = inPFMETC.pt();
+            evtInfo->pfMETCphi   = inPFMETC.phi();
+            evtInfo->pfMETCCov00 = inPFMETC.getSignificanceMatrix()(0,0);
+            evtInfo->pfMETCCov01 = inPFMETC.getSignificanceMatrix()(0,1);
+            evtInfo->pfMETCCov11 = inPFMETC.getSignificanceMatrix()(1,1);
 
-        // MVA MET
-        /*
-           if(fMVAMETName.size() > 0) { 
-           edm::Handle<reco::PFMETCollection> hMVAMETProduct;
-           iEvent.getByToken(fTokMVAMETName,hMVAMETProduct);
-           assert(hMVAMETProduct.isValid());
-           const reco::PFMET &inMVAMET = hMVAMETProduct.product()->front();
-           evtInfo->mvaMET      = inMVAMET.pt();
-           evtInfo->mvaMETphi   = inMVAMET.phi();
-           evtInfo->mvaMETCov00 = inMVAMET.getSignificanceMatrix()(0,0);
-           evtInfo->mvaMETCov01 = inMVAMET.getSignificanceMatrix()(0,1);
-           evtInfo->mvaMETCov11 = inMVAMET.getSignificanceMatrix()(1,1);
-           }
-        // MVA MET with unity response
-        edm::Handle<reco::PFMETCollection> hMVAMETUProduct;
-        iEvent.getByToken(fTokMVAMETUName,hMVAMETUProduct);
-        assert(hMVAMETUProduct.isValid());
-        const reco::PFMET &inMVAMETU = hMVAMETUProduct.product()->front();
-        evtInfo->mvaMETU      = inMVAMETU.pt();
-        evtInfo->mvaMETUphi   = inMVAMETU.phi();
-        //    evtInfo->mvaMETUCov00 = inMVAMETU.getSignificanceMatrix()(0,0);
-        //    evtInfo->mvaMETUCov01 = inMVAMETU.getSignificanceMatrix()(0,1);
-        //    evtInfo->mvaMETUCov11 = inMVAMETU.getSignificanceMatrix()(1,1);
+            // MVA MET
+            /*
+               if(fMVAMETName.size() > 0) { 
+               edm::Handle<reco::PFMETCollection> hMVAMETProduct;
+               iEvent.getByToken(fTokMVAMETName,hMVAMETProduct);
+               assert(hMVAMETProduct.isValid());
+               const reco::PFMET &inMVAMET = hMVAMETProduct.product()->front();
+               evtInfo->mvaMET      = inMVAMET.pt();
+               evtInfo->mvaMETphi   = inMVAMET.phi();
+               evtInfo->mvaMETCov00 = inMVAMET.getSignificanceMatrix()(0,0);
+               evtInfo->mvaMETCov01 = inMVAMET.getSignificanceMatrix()(0,1);
+               evtInfo->mvaMETCov11 = inMVAMET.getSignificanceMatrix()(1,1);
+               }
+            // MVA MET with unity response
+            edm::Handle<reco::PFMETCollection> hMVAMETUProduct;
+            iEvent.getByToken(fTokMVAMETUName,hMVAMETUProduct);
+            assert(hMVAMETUProduct.isValid());
+            const reco::PFMET &inMVAMETU = hMVAMETUProduct.product()->front();
+            evtInfo->mvaMETU      = inMVAMETU.pt();
+            evtInfo->mvaMETUphi   = inMVAMETU.phi();
+            //    evtInfo->mvaMETUCov00 = inMVAMETU.getSignificanceMatrix()(0,0);
+            //    evtInfo->mvaMETUCov01 = inMVAMETU.getSignificanceMatrix()(0,1);
+            //    evtInfo->mvaMETUCov11 = inMVAMETU.getSignificanceMatrix()(1,1);
 
-        // MVA MET without jet smearing (relevant only for MC)
-        edm::Handle<reco::PFMETCollection> hMVAMET0Product;
-        iEvent.getByToken(fTokMVAMET0Name,hMVAMET0Product);
-        assert(hMVAMET0Product.isValid());
-        const reco::PFMET &inMVAMET0 = hMVAMET0Product.product()->front();
-        evtInfo->mvaMET0      = inMVAMET0.pt();
-        evtInfo->mvaMET0phi   = inMVAMET0.phi();
-        //    evtInfo->mvaMET0Cov00 = inMVAMET0.getSignificanceMatrix()(0,0);
-        //    evtInfo->mvaMET0Cov01 = inMVAMET0.getSignificanceMatrix()(0,1);
-        //    evtInfo->mvaMET0Cov11 = inMVAMET0.getSignificanceMatrix()(1,1);
-        */
-        // PUPPI MET
-        edm::Handle<reco::PFMETCollection> hPuppET;
-        iEvent.getByToken(fTokPUPPETName,hPuppET);
-        assert(hPuppET.isValid());
-        const reco::PFMET &inPuppET = hPuppET.product()->front();
-        evtInfo->puppET      = inPuppET.pt();
-        evtInfo->puppETphi   = inPuppET.phi();
-        evtInfo->puppETCov00 = inPuppET.getSignificanceMatrix()(0,0);
-        evtInfo->puppETCov01 = inPuppET.getSignificanceMatrix()(0,1);
-        evtInfo->puppETCov11 = inPuppET.getSignificanceMatrix()(1,1);
+            // MVA MET without jet smearing (relevant only for MC)
+            edm::Handle<reco::PFMETCollection> hMVAMET0Product;
+            iEvent.getByToken(fTokMVAMET0Name,hMVAMET0Product);
+            assert(hMVAMET0Product.isValid());
+            const reco::PFMET &inMVAMET0 = hMVAMET0Product.product()->front();
+            evtInfo->mvaMET0      = inMVAMET0.pt();
+            evtInfo->mvaMET0phi   = inMVAMET0.phi();
+            //    evtInfo->mvaMET0Cov00 = inMVAMET0.getSignificanceMatrix()(0,0);
+            //    evtInfo->mvaMET0Cov01 = inMVAMET0.getSignificanceMatrix()(0,1);
+            //    evtInfo->mvaMET0Cov11 = inMVAMET0.getSignificanceMatrix()(1,1);
+            */
+            // PUPPI MET
+            edm::Handle<reco::PFMETCollection> hPuppET;
+            iEvent.getByToken(fTokPUPPETName,hPuppET);
+            assert(hPuppET.isValid());
+            const reco::PFMET &inPuppET = hPuppET.product()->front();
+            evtInfo->puppET      = inPuppET.pt();
+            evtInfo->puppETphi   = inPuppET.phi();
+            evtInfo->puppETCov00 = inPuppET.getSignificanceMatrix()(0,0);
+            evtInfo->puppETCov01 = inPuppET.getSignificanceMatrix()(0,1);
+            evtInfo->puppETCov11 = inPuppET.getSignificanceMatrix()(1,1);
 
-        // Type 1 PUPPI MET
-        edm::Handle<reco::PFMETCollection> hPuppETC;
-        iEvent.getByToken(fTokPUPPETCName,hPuppETC);
-        assert(hPuppETC.isValid());
-        const reco::PFMET &inPuppETC = hPuppETC.product()->front();
-        evtInfo->puppETC      = inPuppETC.pt();
-        evtInfo->puppETCphi   = inPuppETC.phi();
-        evtInfo->puppETCCov00 = inPuppETC.getSignificanceMatrix()(0,0);
-        evtInfo->puppETCCov01 = inPuppETC.getSignificanceMatrix()(0,1);
-        evtInfo->puppETCCov11 = inPuppETC.getSignificanceMatrix()(1,1);
+            // Type 1 PUPPI MET
+            edm::Handle<reco::PFMETCollection> hPuppETC;
+            iEvent.getByToken(fTokPUPPETCName,hPuppETC);
+            assert(hPuppETC.isValid());
+            const reco::PFMET &inPuppETC = hPuppETC.product()->front();
+            evtInfo->puppETC      = inPuppETC.pt();
+            evtInfo->puppETCphi   = inPuppETC.phi();
+            evtInfo->puppETCCov00 = inPuppETC.getSignificanceMatrix()(0,0);
+            evtInfo->puppETCCov01 = inPuppETC.getSignificanceMatrix()(0,1);
+            evtInfo->puppETCCov11 = inPuppETC.getSignificanceMatrix()(1,1);
 
-        // Alpaca MET
-        if(fALPACAMETName.size() > 0) { 
-            edm::Handle<reco::PFMETCollection> hAlpacaMET;
-            iEvent.getByToken(fTokALPACAMETName,hAlpacaMET);
-            assert(hAlpacaMET.isValid());
-            const reco::PFMET &inAlpacaMET = hAlpacaMET.product()->front();
-            evtInfo->alpacaMET      = inAlpacaMET.pt();
-            evtInfo->alpacaMETphi   = inAlpacaMET.phi();
+            // Alpaca MET
+            if(fALPACAMETName.size() > 0) { 
+                edm::Handle<reco::PFMETCollection> hAlpacaMET;
+                iEvent.getByToken(fTokALPACAMETName,hAlpacaMET);
+                assert(hAlpacaMET.isValid());
+                const reco::PFMET &inAlpacaMET = hAlpacaMET.product()->front();
+                evtInfo->alpacaMET      = inAlpacaMET.pt();
+                evtInfo->alpacaMETphi   = inAlpacaMET.phi();
+            }
+            if(fPALPACAMETName.size() > 0) { 
+                edm::Handle<reco::PFMETCollection> hPAlpacaMET;
+                iEvent.getByToken(fTokPALPACAMETName,hPAlpacaMET);
+                assert(hPAlpacaMET.isValid());
+                const reco::PFMET &inPAlpacaMET = hPAlpacaMET.product()->front();
+                evtInfo->pcpMET      = inPAlpacaMET.pt();
+                evtInfo->pcpMETphi   = inPAlpacaMET.phi();
+            }
+
+            // Track MET
+            /*
+               edm::Handle<reco::VertexCollection> hVertexProduct;
+               iEvent.getByToken(fTokPVName,hVertexProduct);
+               assert(hVertexProduct.isValid());
+               const reco::VertexCollection *pvCol = hVertexProduct.product();
+
+               edm::Handle<reco::PFCandidateCollection> hPFCandProduct;
+               iEvent.getByToken(fTokPFCandName,hPFCandProduct);
+               assert(hPFCandProduct.isValid());
+               const reco::PFCandidateCollection *pfCandCol = hPFCandProduct.product();
+               computeTrackMET(0, pvCol, pfCandCol, evtInfo->trkMET, evtInfo->trkMETphi);
+               */
+        } else {  // === MINIAOD ===
+
+            edm::Handle<pat::METCollection> hMETProduct;
+            iEvent.getByToken(fTokPFMETPATName,hMETProduct);
+            assert(hMETProduct.isValid());
+            const pat::MET &inMET = hMETProduct->front();
+            // Raw PF MET
+            evtInfo->pfMET      = inMET.uncorPt();
+            evtInfo->pfMETphi   = inMET.uncorPhi();
+            evtInfo->pfMETCov00 = inMET.getSignificanceMatrix()(0,0);
+            evtInfo->pfMETCov01 = inMET.getSignificanceMatrix()(0,1);
+            evtInfo->pfMETCov11 = inMET.getSignificanceMatrix()(1,1);
+
+            // Corrected PF MET
+            evtInfo->pfMETC      = inMET.pt();
+            evtInfo->pfMETCphi   = inMET.phi();
+            evtInfo->pfMETCCov00 = inMET.getSignificanceMatrix()(0,0);
+            evtInfo->pfMETCCov01 = inMET.getSignificanceMatrix()(0,1);
+            evtInfo->pfMETCCov11 = inMET.getSignificanceMatrix()(1,1);
+            evtInfo->pfMETCjerup = inMET.shiftedP4(pat::MET::JetResUp).pt();
+            evtInfo->pfMETCjerdn = inMET.shiftedP4(pat::MET::JetResDown).pt();
+            evtInfo->pfMETCjenup = inMET.shiftedP4(pat::MET::JetEnUp).pt();
+            evtInfo->pfMETCjendn = inMET.shiftedP4(pat::MET::JetEnDown).pt();
+            evtInfo->pfMETCuncup = inMET.shiftedP4(pat::MET::UnclusteredEnUp).pt();
+            evtInfo->pfMETCuncdn = inMET.shiftedP4(pat::MET::UnclusteredEnDown).pt();
+            evtInfo->pfMETCjrsup = inMET.shiftedP4(pat::MET::PhotonEnUp).pt();
+            evtInfo->pfMETCjrsdn = inMET.shiftedP4(pat::MET::PhotonEnDown).pt();
+            evtInfo->pfMETCphijerup = inMET.shiftedP4(pat::MET::JetResUp).phi();
+            evtInfo->pfMETCphijerdn = inMET.shiftedP4(pat::MET::JetResDown).phi();
+            evtInfo->pfMETCphijenup = inMET.shiftedP4(pat::MET::JetEnUp).phi();
+            evtInfo->pfMETCphijendn = inMET.shiftedP4(pat::MET::JetEnDown).phi();
+            evtInfo->pfMETCphiuncup = inMET.shiftedP4(pat::MET::UnclusteredEnUp).phi();
+            evtInfo->pfMETCphiuncdn = inMET.shiftedP4(pat::MET::UnclusteredEnDown).phi();
+            evtInfo->pfMETCphijrsup = inMET.shiftedP4(pat::MET::PhotonEnUp).phi();
+            evtInfo->pfMETCphijrsdn = inMET.shiftedP4(pat::MET::PhotonEnDown).phi();
+
+            //Calo MET
+            edm::Handle<pat::METCollection> hCaloMETProduct;
+            iEvent.getByToken(fTokPFMETPATName,hCaloMETProduct);
+            assert(hCaloMETProduct.isValid());
+            const pat::MET &inCaloMET = hCaloMETProduct->front();
+            evtInfo->caloMET      = inCaloMET.caloMETPt();
+            evtInfo->caloMETphi   = inCaloMET.caloMETPhi();
+            //evtInfo->caloMETCov00 = inCaloMET.getSignificanceMatrix()(0,0);
+            //evtInfo->caloMETCov01 = inCaloMET.getSignificanceMatrix()(0,1);
+            //evtInfo->caloMETCov11 = inCaloMET.getSignificanceMatrix()(1,1);
+            // MVA MET
+            /*
+               if(fMVAMETName.size() > 0) { 
+               edm::Handle<reco::PFMETCollection> hMVAMETProduct;
+               iEvent.getByToken(fTokMVAMETName,hMVAMETProduct);
+               assert(hMVAMETProduct.isValid());
+               const reco::PFMET &inMVAMET = hMVAMETProduct.product()->front();
+               evtInfo->mvaMET      = inMVAMET.pt();
+               evtInfo->mvaMETphi   = inMVAMET.phi();
+               }
+               */
+            //    evtInfo->mvaMETCov00 = inMVAMET.getSignificanceMatrix()(0,0);
+            //    evtInfo->mvaMETCov01 = inMVAMET.getSignificanceMatrix()(0,1);
+            //    evtInfo->mvaMETCov11 = inMVAMET.getSignificanceMatrix()(1,1);
+
+            // MVA MET with unity response
+            //edm::Handle<reco::PFMETCollection> hMVAMETUProduct;
+            //iEvent.getByToken(fTokMVAMETUName,hMVAMETUProduct);
+            //assert(hMVAMETUProduct.isValid());
+            //const reco::PFMET &inMVAMETU = hMVAMETUProduct.product()->front();
+            //evtInfo->mvaMETU      = inMVAMETU.pt();
+            //evtInfo->mvaMETUphi   = inMVAMETU.phi();
+            //    evtInfo->mvaMETUCov00 = inMVAMETU.getSignificanceMatrix()(0,0);
+            //    evtInfo->mvaMETUCov01 = inMVAMETU.getSignificanceMatrix()(0,1);
+            //    evtInfo->mvaMETUCov11 = inMVAMETU.getSignificanceMatrix()(1,1);
+
+            // MVA MET without jet smearing (relevant only for MC)
+            //edm::Handle<reco::PFMETCollection> hMVAMET0Product;
+            //iEvent.getByToken(fTokMVAMET0Name,hMVAMET0Product);
+            //assert(hMVAMET0Product.isValid());
+            //const reco::PFMET &inMVAMET0 = hMVAMET0Product.product()->front();
+            //evtInfo->mvaMET0      = inMVAMET0.pt();
+            //evtInfo->mvaMET0phi   = inMVAMET0.phi();
+            //    evtInfo->mvaMET0Cov00 = inMVAMET0.getSignificanceMatrix()(0,0);
+            //    evtInfo->mvaMET0Cov01 = inMVAMET0.getSignificanceMatrix()(0,1);
+            //    evtInfo->mvaMET0Cov11 = inMVAMET0.getSignificanceMatrix()(1,1);
+
+            // PUPPI MET
+            edm::Handle<pat::METCollection> hPuppET;
+            iEvent.getByToken(fTokPUPPETPATName,hPuppET);
+            assert(hPuppET.isValid());
+            const pat::MET &inPuppET = hPuppET.product()->front();
+            evtInfo->puppET      = inPuppET.uncorPt();
+            evtInfo->puppETphi   = inPuppET.uncorPhi();
+            //Type1 PUPPI MET
+            evtInfo->puppETC      = inPuppET.pt();
+            evtInfo->puppETCphi   = inPuppET.phi();
+            evtInfo->puppETCov00  = inPuppET.getSignificanceMatrix()(0,0);
+            evtInfo->puppETCov01  = inPuppET.getSignificanceMatrix()(0,1);
+            evtInfo->puppETCov11  = inPuppET.getSignificanceMatrix()(1,1);
+            /*
+               evtInfo->puppETCjerup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResUp);
+               evtInfo->puppETCjerdn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResDown);
+               evtInfo->puppETCjenup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetEnUp);
+               evtInfo->puppETCjendn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetEnDown);
+               evtInfo->puppETCuncup = inPuppET.shiftedPt(pat::MET::METUncertainty::UnclusteredEnUp);
+               evtInfo->puppETCuncdn = inPuppET.shiftedPt(pat::MET::METUncertainty::UnclusteredEnDown);
+               evtInfo->puppETCjrsup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResUpSmear);
+               evtInfo->puppETCjrsdn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResDownSmear);
+               evtInfo->puppETCphijerup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResUp);
+               evtInfo->puppETCphijerdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResDown);
+               evtInfo->puppETCphijenup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetEnUp);
+               evtInfo->puppETCphijendn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetEnDown);
+               evtInfo->puppETCphiuncup = inPuppET.shiftedPhi(pat::MET::METUncertainty::UnclusteredEnUp);
+               evtInfo->puppETCphiuncdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::UnclusteredEnDown);
+               evtInfo->puppETCphijrsup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResUpSmear);
+               evtInfo->puppETCphijrsdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResDownSmear);
+               */
+            // Alpaca MET
+            if(fALPACAMETName.size() > 0) { 
+                edm::Handle<reco::PFMETCollection> hAlpacaMET;
+                iEvent.getByToken(fTokALPACAMETName,hAlpacaMET);
+                assert(hAlpacaMET.isValid());
+                const reco::PFMET &inAlpacaMET = hAlpacaMET.product()->front();
+                evtInfo->alpacaMET      = inAlpacaMET.pt();
+                evtInfo->alpacaMETphi   = inAlpacaMET.phi();
+            }
+            if(fPALPACAMETName.size() > 0) { 
+                edm::Handle<reco::PFMETCollection> hPAlpacaMET;
+                iEvent.getByToken(fTokPALPACAMETName,hPAlpacaMET);
+                assert(hPAlpacaMET.isValid());
+                const reco::PFMET &inPAlpacaMET = hPAlpacaMET.product()->front();
+                evtInfo->pcpMET      = inPAlpacaMET.pt();
+                evtInfo->pcpMETphi   = inPAlpacaMET.phi();
+            }
+            // Track MET
+            edm::Handle<pat::PackedCandidateCollection> hPFCandProduct;
+            iEvent.getByToken(fTokPackCandName,hPFCandProduct);
+            assert(hPFCandProduct.isValid());
+            const pat::PackedCandidateCollection *pfCandCol = hPFCandProduct.product();
+            computeTrackMET(pfCandCol, evtInfo->trkMET, evtInfo->trkMETphi);
         }
-        if(fPALPACAMETName.size() > 0) { 
-            edm::Handle<reco::PFMETCollection> hPAlpacaMET;
-            iEvent.getByToken(fTokPALPACAMETName,hPAlpacaMET);
-            assert(hPAlpacaMET.isValid());
-            const reco::PFMET &inPAlpacaMET = hPAlpacaMET.product()->front();
-            evtInfo->pcpMET      = inPAlpacaMET.pt();
-            evtInfo->pcpMETphi   = inPAlpacaMET.phi();
-        }
-
-        // Track MET
-        /*
-           edm::Handle<reco::VertexCollection> hVertexProduct;
-           iEvent.getByToken(fTokPVName,hVertexProduct);
-           assert(hVertexProduct.isValid());
-           const reco::VertexCollection *pvCol = hVertexProduct.product();
-
-           edm::Handle<reco::PFCandidateCollection> hPFCandProduct;
-           iEvent.getByToken(fTokPFCandName,hPFCandProduct);
-           assert(hPFCandProduct.isValid());
-           const reco::PFCandidateCollection *pfCandCol = hPFCandProduct.product();
-           computeTrackMET(0, pvCol, pfCandCol, evtInfo->trkMET, evtInfo->trkMETphi);
-           */
-    } else {  // === MINIAOD ===
-
-        edm::Handle<pat::METCollection> hMETProduct;
-        iEvent.getByToken(fTokPFMETPATName,hMETProduct);
-        assert(hMETProduct.isValid());
-        const pat::MET &inMET = hMETProduct->front();
-        // Raw PF MET
-        evtInfo->pfMET      = inMET.uncorPt();
-        evtInfo->pfMETphi   = inMET.uncorPhi();
-        evtInfo->pfMETCov00 = inMET.getSignificanceMatrix()(0,0);
-        evtInfo->pfMETCov01 = inMET.getSignificanceMatrix()(0,1);
-        evtInfo->pfMETCov11 = inMET.getSignificanceMatrix()(1,1);
-
-        // Corrected PF MET
-        evtInfo->pfMETC      = inMET.pt();
-        evtInfo->pfMETCphi   = inMET.phi();
-        evtInfo->pfMETCCov00 = inMET.getSignificanceMatrix()(0,0);
-        evtInfo->pfMETCCov01 = inMET.getSignificanceMatrix()(0,1);
-        evtInfo->pfMETCCov11 = inMET.getSignificanceMatrix()(1,1);
-        evtInfo->pfMETCjerup = inMET.shiftedP4(pat::MET::JetResUp).pt();
-        evtInfo->pfMETCjerdn = inMET.shiftedP4(pat::MET::JetResDown).pt();
-        evtInfo->pfMETCjenup = inMET.shiftedP4(pat::MET::JetEnUp).pt();
-        evtInfo->pfMETCjendn = inMET.shiftedP4(pat::MET::JetEnDown).pt();
-        evtInfo->pfMETCuncup = inMET.shiftedP4(pat::MET::UnclusteredEnUp).pt();
-        evtInfo->pfMETCuncdn = inMET.shiftedP4(pat::MET::UnclusteredEnDown).pt();
-        evtInfo->pfMETCjrsup = inMET.shiftedP4(pat::MET::PhotonEnUp).pt();
-        evtInfo->pfMETCjrsdn = inMET.shiftedP4(pat::MET::PhotonEnDown).pt();
-        evtInfo->pfMETCphijerup = inMET.shiftedP4(pat::MET::JetResUp).phi();
-        evtInfo->pfMETCphijerdn = inMET.shiftedP4(pat::MET::JetResDown).phi();
-        evtInfo->pfMETCphijenup = inMET.shiftedP4(pat::MET::JetEnUp).phi();
-        evtInfo->pfMETCphijendn = inMET.shiftedP4(pat::MET::JetEnDown).phi();
-        evtInfo->pfMETCphiuncup = inMET.shiftedP4(pat::MET::UnclusteredEnUp).phi();
-        evtInfo->pfMETCphiuncdn = inMET.shiftedP4(pat::MET::UnclusteredEnDown).phi();
-        evtInfo->pfMETCphijrsup = inMET.shiftedP4(pat::MET::PhotonEnUp).phi();
-        evtInfo->pfMETCphijrsdn = inMET.shiftedP4(pat::MET::PhotonEnDown).phi();
-
-        //Calo MET
-        edm::Handle<pat::METCollection> hCaloMETProduct;
-        iEvent.getByToken(fTokPFMETPATName,hCaloMETProduct);
-        assert(hCaloMETProduct.isValid());
-        const pat::MET &inCaloMET = hCaloMETProduct->front();
-        evtInfo->caloMET      = inCaloMET.caloMETPt();
-        evtInfo->caloMETphi   = inCaloMET.caloMETPhi();
-        //evtInfo->caloMETCov00 = inCaloMET.getSignificanceMatrix()(0,0);
-        //evtInfo->caloMETCov01 = inCaloMET.getSignificanceMatrix()(0,1);
-        //evtInfo->caloMETCov11 = inCaloMET.getSignificanceMatrix()(1,1);
-        // MVA MET
-        /*
-           if(fMVAMETName.size() > 0) { 
-           edm::Handle<reco::PFMETCollection> hMVAMETProduct;
-           iEvent.getByToken(fTokMVAMETName,hMVAMETProduct);
-           assert(hMVAMETProduct.isValid());
-           const reco::PFMET &inMVAMET = hMVAMETProduct.product()->front();
-           evtInfo->mvaMET      = inMVAMET.pt();
-           evtInfo->mvaMETphi   = inMVAMET.phi();
-           }
-           */
-        //    evtInfo->mvaMETCov00 = inMVAMET.getSignificanceMatrix()(0,0);
-        //    evtInfo->mvaMETCov01 = inMVAMET.getSignificanceMatrix()(0,1);
-        //    evtInfo->mvaMETCov11 = inMVAMET.getSignificanceMatrix()(1,1);
-
-        // MVA MET with unity response
-        //edm::Handle<reco::PFMETCollection> hMVAMETUProduct;
-        //iEvent.getByToken(fTokMVAMETUName,hMVAMETUProduct);
-        //assert(hMVAMETUProduct.isValid());
-        //const reco::PFMET &inMVAMETU = hMVAMETUProduct.product()->front();
-        //evtInfo->mvaMETU      = inMVAMETU.pt();
-        //evtInfo->mvaMETUphi   = inMVAMETU.phi();
-        //    evtInfo->mvaMETUCov00 = inMVAMETU.getSignificanceMatrix()(0,0);
-        //    evtInfo->mvaMETUCov01 = inMVAMETU.getSignificanceMatrix()(0,1);
-        //    evtInfo->mvaMETUCov11 = inMVAMETU.getSignificanceMatrix()(1,1);
-
-        // MVA MET without jet smearing (relevant only for MC)
-        //edm::Handle<reco::PFMETCollection> hMVAMET0Product;
-        //iEvent.getByToken(fTokMVAMET0Name,hMVAMET0Product);
-        //assert(hMVAMET0Product.isValid());
-        //const reco::PFMET &inMVAMET0 = hMVAMET0Product.product()->front();
-        //evtInfo->mvaMET0      = inMVAMET0.pt();
-        //evtInfo->mvaMET0phi   = inMVAMET0.phi();
-        //    evtInfo->mvaMET0Cov00 = inMVAMET0.getSignificanceMatrix()(0,0);
-        //    evtInfo->mvaMET0Cov01 = inMVAMET0.getSignificanceMatrix()(0,1);
-        //    evtInfo->mvaMET0Cov11 = inMVAMET0.getSignificanceMatrix()(1,1);
-
-        // PUPPI MET
-        edm::Handle<pat::METCollection> hPuppET;
-        iEvent.getByToken(fTokPUPPETPATName,hPuppET);
-        assert(hPuppET.isValid());
-        const pat::MET &inPuppET = hPuppET.product()->front();
-        evtInfo->puppET      = inPuppET.uncorPt();
-        evtInfo->puppETphi   = inPuppET.uncorPhi();
-        //Type1 PUPPI MET
-        evtInfo->puppETC      = inPuppET.pt();
-        evtInfo->puppETCphi   = inPuppET.phi();
-        evtInfo->puppETCov00  = inPuppET.getSignificanceMatrix()(0,0);
-        evtInfo->puppETCov01  = inPuppET.getSignificanceMatrix()(0,1);
-        evtInfo->puppETCov11  = inPuppET.getSignificanceMatrix()(1,1);
-        /*
-           evtInfo->puppETCjerup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResUp);
-           evtInfo->puppETCjerdn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResDown);
-           evtInfo->puppETCjenup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetEnUp);
-           evtInfo->puppETCjendn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetEnDown);
-           evtInfo->puppETCuncup = inPuppET.shiftedPt(pat::MET::METUncertainty::UnclusteredEnUp);
-           evtInfo->puppETCuncdn = inPuppET.shiftedPt(pat::MET::METUncertainty::UnclusteredEnDown);
-           evtInfo->puppETCjrsup = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResUpSmear);
-           evtInfo->puppETCjrsdn = inPuppET.shiftedPt(pat::MET::METUncertainty::JetResDownSmear);
-           evtInfo->puppETCphijerup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResUp);
-           evtInfo->puppETCphijerdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResDown);
-           evtInfo->puppETCphijenup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetEnUp);
-           evtInfo->puppETCphijendn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetEnDown);
-           evtInfo->puppETCphiuncup = inPuppET.shiftedPhi(pat::MET::METUncertainty::UnclusteredEnUp);
-           evtInfo->puppETCphiuncdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::UnclusteredEnDown);
-           evtInfo->puppETCphijrsup = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResUpSmear);
-           evtInfo->puppETCphijrsdn = inPuppET.shiftedPhi(pat::MET::METUncertainty::JetResDownSmear);
-           */
-        // Alpaca MET
-        if(fALPACAMETName.size() > 0) { 
-            edm::Handle<reco::PFMETCollection> hAlpacaMET;
-            iEvent.getByToken(fTokALPACAMETName,hAlpacaMET);
-            assert(hAlpacaMET.isValid());
-            const reco::PFMET &inAlpacaMET = hAlpacaMET.product()->front();
-            evtInfo->alpacaMET      = inAlpacaMET.pt();
-            evtInfo->alpacaMETphi   = inAlpacaMET.phi();
-        }
-        if(fPALPACAMETName.size() > 0) { 
-            edm::Handle<reco::PFMETCollection> hPAlpacaMET;
-            iEvent.getByToken(fTokPALPACAMETName,hPAlpacaMET);
-            assert(hPAlpacaMET.isValid());
-            const reco::PFMET &inPAlpacaMET = hPAlpacaMET.product()->front();
-            evtInfo->pcpMET      = inPAlpacaMET.pt();
-            evtInfo->pcpMETphi   = inPAlpacaMET.phi();
-        }
-        // Track MET
-        edm::Handle<pat::PackedCandidateCollection> hPFCandProduct;
-        iEvent.getByToken(fTokPackCandName,hPFCandProduct);
-        assert(hPFCandProduct.isValid());
-        const pat::PackedCandidateCollection *pfCandCol = hPFCandProduct.product();
-        computeTrackMET(pfCandCol, evtInfo->trkMET, evtInfo->trkMETphi);
     }
 
 

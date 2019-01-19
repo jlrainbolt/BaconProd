@@ -25,9 +25,9 @@ if is_data_flag:
 from BaconProd.Ntupler.myJecFromDB_cff    import setupJEC
 setupJEC(process,is_data_flag,JECTag)
 if is_data_flag:
-    process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+    process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 else:
-    process.jec.connect = cms.string('sqlite:////'+cmssw_base+'/src/BaconProd/Utils/data/'+JECTag+'.db')
+    process.jec.connect = cms.string('sqlite:///src/BaconProd/Utils/data/'+JECTag+'.db')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -218,7 +218,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject     = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile       = cms.untracked.string(hlt_filename),
         useAOD            = cms.untracked.bool(False),
-        outputName        = cms.untracked.string('Output_Data.root'),
+        outputName        = cms.untracked.string('Output.root'),
         edmPVName         = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName = cms.untracked.string('generator'),
 

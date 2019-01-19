@@ -72,16 +72,19 @@ def main():
         config.General.transferLogs = False
 
         config.JobType.pluginName = 'Analysis'
-        config.JobType.psetName = 'makingBacon_MC_25ns_MINIAOD.py'
+        config.JobType.psetName = 'trimmedBacon.py'
         config.JobType.outputFiles = ['Output.root']
 
         config.Data.inputDataset = None
         config.Data.inputDBS = 'global'
         config.Data.ignoreLocality = True
         config.Site.whitelist = ["T2_US*"]
-        config.Data.splitting = 'EventAwareLumiBased'
-        config.Data.unitsPerJob = 5000
-        config.Data.totalUnits = 2000000
+        #config.Data.splitting = 'EventAwareLumiBased'
+        #config.Data.unitsPerJob = 5000
+        #config.Data.totalUnits = 2000000
+        config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = 1
+        config.Data.totalUnits = 10
         config.Data.outputDatasetTag = None
         config.Data.outLFNDirBase = '/store/user/%s/mc_2016/' % (getUsernameFromSiteDB())
 
@@ -96,7 +99,6 @@ def main():
         for inDS in inputDatasets:
             # inDS is of the form /A/B/C. Since B is unique for each inDS, use this in the CRAB request name.
             config.General.requestName = inDS.split('/')[1] #+ '_recovery'# + '_' + inDS.split('/')[2]
-            #config.Data.lumiMask = config.General.workArea + '/crab_ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_calib_all_gen/results/notFinishedLumis.json'
             config.Data.inputDataset = inDS
             config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)
             # Submit.
