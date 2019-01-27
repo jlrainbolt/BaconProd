@@ -13,3 +13,7 @@ __init__.py
 # Stuff
 *~
 *.log
+
+# crab working directories
+Ntupler/crab/mc_2016*
+Ntupler/crab/data_2016*

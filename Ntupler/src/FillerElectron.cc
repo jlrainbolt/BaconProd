@@ -456,14 +456,17 @@ void FillerElectron::fill(TClonesArray *array,
     //
     // MVA identification
     //==============================
-    pElectron->mva2016HZZ       = itEle->userFloat("ElectronMVAEstimatorRun2Spring16HZZV1Values");
-    pElectron->cat2016HZZ       = itEle->userInt("ElectronMVAEstimatorRun2Spring16HZZV1Categories");
-    pElectron->pass2016HZZwpLoose = itEle->electronID("mvaEleID-Spring16-HZZ-V1-wpLoose");
-    pElectron->mva2017isoV2     = itEle->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
-    pElectron->cat2017isoV2     = itEle->userInt("ElectronMVAEstimatorRun2Fall17IsoV2Categories");
-    pElectron->pass2017isoV2wpHZZ = itEle->electronID("mvaEleID-Fall17-iso-V2-wpHZZ");
-    pElectron->mva2017noIsoV2   = itEle->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
-    pElectron->cat2017noIsoV2   = itEle->userInt("ElectronMVAEstimatorRun2Fall17NoIsoV2Categories");
+    pElectron->mva2016HZZ           = itEle->userFloat("ElectronMVAEstimatorRun2Spring16HZZV1Values");
+    pElectron->pass2016HZZwpLoose   = itEle->electronID("mvaEleID-Spring16-HZZ-V1-wpLoose");
+    pElectron->mva2017isoV1         = itEle->userFloat("ElectronMVAEstimatorRun2Fall17IsoV1Values");
+    pElectron->pass2017isoV1wpLoose = itEle->electronID("mvaEleID-Fall17-iso-V1-wpLoose");
+    pElectron->mva2017noIsoV1       = itEle->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV1Values");
+    pElectron->pass2017noIsoV1wpLoose = itEle->electronID("mvaEleID-Fall17-noIso-V1-wpLoose");
+    pElectron->mva2017isoV2         = itEle->userFloat("ElectronMVAEstimatorRun2Fall17IsoV2Values");
+    pElectron->pass2017isoV2wpHZZ   = itEle->electronID("mvaEleID-Fall17-iso-V2-wpHZZ");
+    pElectron->pass2017isoV2wpLoose = itEle->electronID("mvaEleID-Fall17-iso-V2-wpLoose");
+    pElectron->mva2017noIsoV2       = itEle->userFloat("ElectronMVAEstimatorRun2Fall17NoIsoV2Values");
+    pElectron->pass2017noIsoV2wpLoose = itEle->electronID("mvaEleID-Fall17-noIso-V2-wpLoose");
 
     pElectron->isConv     = !itEle->passConversionVeto();
 

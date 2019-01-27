@@ -69,7 +69,7 @@ def main():
         config.General.requestName = None
         config.General.workArea = 'data_2016'
         config.General.transferOutputs = True
-        config.General.transferLogs = False
+        config.General.transferLogs = True
 
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'trimmedBacon_Data.py'
@@ -81,9 +81,10 @@ def main():
         config.section_("Debug")
         config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
         config.Site.whitelist = ["T2_US*"]
-        config.Data.splitting = 'EventAwareLumiBased'
-        config.Data.unitsPerJob = 5000
-        config.Data.totalUnits = 1000000
+        config.Data.splitting = 'Automatic'
+        #config.Data.splitting = 'EventAwareLumiBased'
+        #config.Data.unitsPerJob = 100000 # DoubleMuon
+        #config.Data.unitsPerJob = 250000 # DoubleEG
         config.Data.outputDatasetTag = None
         config.Data.outLFNDirBase = '/store/user/%s/data_2016/' % (getUsernameFromSiteDB())
 
@@ -92,8 +93,23 @@ def main():
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
-                            '/DoubleMuon/Run2016H-17Jul2018-v1/MINIAOD', 
-                            '/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD', 
+              #'/DoubleEG/Run2016B-17Jul2018_ver1-v1/MINIAOD',
+              #'/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD',
+              #'/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD',
+               '/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD',
+              #'/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD',
+              #'/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD',
+              #'/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD',
+              #'/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD',
+
+              #'/DoubleMuon/Run2016B-17Jul2018_ver1-v1/MINIAOD',
+              #'/DoubleMuon/Run2016B-17Jul2018_ver2-v1/MINIAOD',
+              #'/DoubleMuon/Run2016C-17Jul2018-v1/MINIAOD',
+               '/DoubleMuon/Run2016D-17Jul2018-v1/MINIAOD',
+              #'/DoubleMuon/Run2016E-17Jul2018-v1/MINIAOD',
+              #'/DoubleMuon/Run2016F-17Jul2018-v1/MINIAOD',
+              #'/DoubleMuon/Run2016G-17Jul2018-v1/MINIAOD',
+              #'/DoubleMuon/Run2016H-17Jul2018-v1/MINIAOD',
                         ]
 
         for inDS in inputDatasets:
