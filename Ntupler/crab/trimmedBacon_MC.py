@@ -3,8 +3,8 @@ import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = True                                        # flag for if process data
-do_hlt_filter = True                                        # flag to skip events that fail relevant triggers
+is_data_flag  = False                                       # flag for if process data
+do_hlt_filter = False                                       # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant triggers
 
 cmssw_base = os.environ['CMSSW_BASE']
@@ -31,7 +31,19 @@ from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
         runEnergyCorrections=False,  # corrections by default are fine for 2016 legacy
         runVID=True,                 # get Fall17V2 IDs, which "breaks" photons
-        era='2016-Legacy')  
+        era='2016-Legacy') 
+
+# Level 1 ECAL prefiring fix
+#   (https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe)
+#   Needs old-style (i.e. not post-VID) photons associated with ValueMaps
+process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
+        ThePhotons = cms.InputTag("slimmedPhotons",processName=cms.InputTag.skipCurrentProcess()),
+        TheJets = cms.InputTag("slimmedJets"),
+        L1Maps = cms.string("src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
+        DataEra = cms.string("2016BtoH"),
+        UseJetEMPt = cms.bool(False),
+        PrefiringRateSystematicUncty = cms.double(0.2)
+        )
 
 #--------------------------------------------------------------------------------
 # Input settings
@@ -129,6 +141,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
 process.baconSequence = cms.Sequence(
         process.egammaPostRecoSeq                  *
+        process.prefiringweight                    *
         process.ntupler
         )
 
