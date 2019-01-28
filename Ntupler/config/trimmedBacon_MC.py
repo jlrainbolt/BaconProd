@@ -48,7 +48,7 @@ process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/270000/4C8E5D5B-47C7-E811-826C-0CC47A0AD48A.root')
         )
@@ -116,7 +116,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
         Electron = cms.untracked.PSet(
                 isActive                  = cms.untracked.bool(True),
-                minPt                     = cms.untracked.double(5),
+                minPt                     = cms.untracked.double(6.9),
                 edmName                   = cms.untracked.string('slimmedElectrons'),
                 edmSCName                 = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
                 edmPuppiName              = cms.untracked.string('puppi'),
@@ -130,7 +130,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
         Muon = cms.untracked.PSet(
                 isActive                  = cms.untracked.bool(True),
-                minPt                     = cms.untracked.double(3),
+                minPt                     = cms.untracked.double(4.9),
                 edmName                   = cms.untracked.string('slimmedMuons'),
                 edmPuppiName              = cms.untracked.string('puppi'),
                 edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),

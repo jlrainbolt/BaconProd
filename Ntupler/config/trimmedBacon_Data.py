@@ -105,7 +105,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
         Electron = cms.untracked.PSet(
                 isActive                  = cms.untracked.bool(True),
-                minPt                     = cms.untracked.double(5),
+                minPt                     = cms.untracked.double(6.9),
                 edmName                   = cms.untracked.string('slimmedElectrons'),
                 edmSCName                 = cms.untracked.InputTag('reducedEgamma','reducedSuperClusters'),
                 edmPuppiName              = cms.untracked.string('puppi'),
@@ -119,7 +119,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
         Muon = cms.untracked.PSet(
                 isActive                  = cms.untracked.bool(True),
-                minPt                     = cms.untracked.double(3),
+                minPt                     = cms.untracked.double(4.9),
                 edmName                   = cms.untracked.string('slimmedMuons'),
                 edmPuppiName              = cms.untracked.string('puppi'),
                 edmPuppiNoLepName         = cms.untracked.string('puppiNoLep'),
