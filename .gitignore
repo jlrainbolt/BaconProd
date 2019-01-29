@@ -14,11 +14,12 @@ __init__.py
 *~
 *.log
 
-# crab working directories
-Ntupler/crab/mc_2016*
-Ntupler/crab/data_2016*
 
-# other
+# crab working directories
+Ntupler/crab/*/
+
+# other directories
 BaconProdScripts
 
-!Utils/data/L1PrefiringMaps_new.root
+# keep ROOT files in data directory
+!Utils/data/*.root
