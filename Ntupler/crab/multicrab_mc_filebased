@@ -67,42 +67,40 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = 'background'
+        config.General.workArea = 'mc_filebased'
         config.General.transferOutputs = True
         config.General.transferLogs = True
 
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'trimmedBacon_MC.py'
         config.JobType.outputFiles = ['Output.root']
+        config.JobType.maxJobRuntimeMin = 2750
+
+        config.Data.splitting = 'FileBased'
+        config.Data.unitsPerJob = 1
 
         config.Data.inputDataset = None
         config.Data.inputDBS = 'global'
-        config.Data.ignoreLocality = True
-        config.Site.whitelist = ["T2_US*"]
-        config.Data.splitting = 'Automatic'
         config.Data.outputDatasetTag = None
-        config.Data.outLFNDirBase = '/store/user/%s/BaconProd/background/' % (getUsernameFromSiteDB())
+        config.Data.publication = False
+        config.Data.outLFNDirBase = '/store/user/%s/BaconProd/%s/' % (getUsernameFromSiteDB(), config.General.workArea)
+        config.Data.ignoreLocality = True
 
+        config.Site.whitelist = ["T2_US*"]
         config.Site.storageSite = 'T3_US_FNALLPC' # Choose your site. 
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
-                            '/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            '/WWTo2L2Nu_13TeV-powheg/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
+                            '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/MINIAODSIM',
                             '/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            '/WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            '/ZZTo2L2Nu_13TeV_powheg_pythia8_ext1/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            '/ZZTo2L2Q_13TeV_powheg_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            '/GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM',
-                            '/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUGenV709_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v1/MINIAODSIM',
                         ]
 
         for inDS in inputDatasets:
             # inDS is of the form /A/B/C. Since B is unique for each inDS, use this in the CRAB request name.
-            config.General.requestName = inDS.split('/')[1] #+ '_recovery'# + '_' + inDS.split('/')[2]
+            config.General.requestName = inDS.split('/')[1]
             config.Data.inputDataset = inDS
-            config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)
+            config.Data.outputDatasetTag = '%s' % (config.General.requestName)
             # Submit.
             try:
                 print "Submitting for input dataset %s" % (inDS)
