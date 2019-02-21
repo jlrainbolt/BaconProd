@@ -40,7 +40,7 @@ setupEgammaPostRecoSeq(process,
 process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
         ThePhotons = cms.InputTag("slimmedPhotons",processName=cms.InputTag.skipCurrentProcess()),
         TheJets = cms.InputTag("slimmedJets"),
-        L1Maps = cms.string(cmssw_base+"/src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
+        L1Maps = cms.string("src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
         DataEra = cms.string("2017BtoF"),
         UseJetEMPt = cms.bool(False),
         PrefiringRateSystematicUncty = cms.double(0.2)
