@@ -1,9 +1,9 @@
 BaconProd
 =========
 
-Branch for producing bacon ntuples of 2016 legacy data and MC
+Branch for producing bacon ntuples of 2016 legacy (MiniAODv3) and 2017 (MiniAODv2) data and MC
 
- * "Runs" on CMS LPC
+ * Runs on CMS LPC
  * Uses CMSSW_9_4_12
  * Depends on jlrainbolt/BaconAna 2016legacy branch
 
@@ -26,5 +26,5 @@ scram b -j 12
 ```
 
 * to run, navigate to BaconProd/Ntupler/config
-    + Data: cmsRun makingBacon_Data_25ns_MINIAOD.py
-    + MC: cmsRun makingBacon_MC_25ns_MINIAOD.py
+    + Data: cmsRun trimmedBacon_Data_2016.py
+    + MC: cmsRun trimmedBacon_MC_2016.py

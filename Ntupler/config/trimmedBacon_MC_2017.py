@@ -10,9 +10,9 @@ hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant t
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
-    process.GlobalTag.globaltag = cms.string('94X_dataRun2_v10')
+    process.GlobalTag.globaltag = cms.string('94X_dataRun2_v6')
 else:
-    process.GlobalTag.globaltag = cms.string('94X_mcRun2_asymptotic_v3')
+    process.GlobalTag.globaltag = cms.string('94X_mc2017_realistic_v14')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -29,9 +29,9 @@ process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 #   (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-        runEnergyCorrections=False,  # corrections by default are fine for 2016 legacy
-        runVID=True,                 # get Fall17V2 IDs, which "breaks" photons
-        era='2016-Legacy')  
+        runEnergyCorrections=True,  # fix bug in 2017 electron energy corrections
+        runVID=True,                # get Fall17V2 IDs, which "breaks" photons
+        era='2017-Nov17ReReco')
 
 # Level 1 ECAL prefiring fix
 #   (https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe)
@@ -40,7 +40,7 @@ process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
         ThePhotons = cms.InputTag("slimmedPhotons",processName=cms.InputTag.skipCurrentProcess()),
         TheJets = cms.InputTag("slimmedJets"),
         L1Maps = cms.string(cmssw_base+"/src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
-        DataEra = cms.string("2016BtoH"),
+        DataEra = cms.string("2017BtoF"),
         UseJetEMPt = cms.bool(False),
         PrefiringRateSystematicUncty = cms.double(0.2)
         )
@@ -48,9 +48,10 @@ process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('/store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/270000/4C8E5D5B-47C7-E811-826C-0CC47A0AD48A.root')
+        fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1/110000/264A231C-3DEC-E811-8E9B-00010100093A.root')
+#       fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/90000/FEFADA2F-8C44-E811-914F-B496910A8618.root')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -74,7 +75,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_MC.root'),
+        outputName          = cms.untracked.string('Trimmed_MC_2017.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
