@@ -110,8 +110,7 @@ def main():
                         ]
 
         for inDS in inputDatasets:
-            config.General.requestName = inDS.split('/')[1] + '_' + inDS.split('/')[2] 
-            config.General.requestName.replace('-31Mar2018-v1', '')
+            config.General.requestName = (inDS.split('/')[1] + '_' + inDS.split('/')[2]).replace('-31Mar2018-v1', '')
             config.Data.inputDataset = inDS
             config.Data.outputDatasetTag = '%s' % (config.General.requestName)
             # Submit.
