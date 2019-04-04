@@ -3,16 +3,14 @@ import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = False                                       # flag for if process data
-do_hlt_filter = False                                       # flag to skip events that fail relevant triggers
+is_data_flag  = True                                        # flag for if process data
+do_hlt_filter = True                                        # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant triggers
 
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
-    process.GlobalTag.globaltag = cms.string('94X_dataRun2_v6')
-else:
-    process.GlobalTag.globaltag = cms.string('94X_mc2017_realistic_v14')
+    process.GlobalTag.globaltag = cms.string('102X_dataRun2_Prompt_v13')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -29,29 +27,16 @@ process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 #   (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-        runEnergyCorrections=True,  # fix bug in 2017 electron energy corrections
+        runEnergyCorrections=True,  # preliminary 2018 electron energy corrections
         runVID=True,                # get Fall17V2 IDs, which "breaks" photons
-        era='2017-Nov17ReReco')
-
-# Level 1 ECAL prefiring fix
-#   (https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe)
-#   Needs old-style (i.e. not post-VID) photons associated with ValueMaps
-process.prefiringweight = cms.EDProducer("L1ECALPrefiringWeightProducer",
-        ThePhotons = cms.InputTag("slimmedPhotons",processName=cms.InputTag.skipCurrentProcess()),
-        TheJets = cms.InputTag("slimmedJets"),
-        L1Maps = cms.string(cmssw_base+"/src/BaconProd/Utils/data/L1PrefiringMaps_new.root"),
-        DataEra = cms.string("2017BtoF"),
-        UseJetEMPt = cms.bool(False),
-        PrefiringRateSystematicUncty = cms.double(0.2)
-        )
+        era='2018-Prompt')
 
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(15000) )
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_new_pmx_94X_mc2017_realistic_v14_ext1-v1/110000/264A231C-3DEC-E811-8E9B-00010100093A.root')
-#       fileNames = cms.untracked.vstring('/store/mc/RunIIFall17MiniAODv2/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/90000/FEFADA2F-8C44-E811-914F-B496910A8618.root')
+        fileNames = cms.untracked.vstring('/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/057/00000/07C1E12E-FD5B-0B47-A700-DE5E56BD458A.root')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -75,7 +60,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_MC_2017.root'),
+        outputName          = cms.untracked.string('Trimmed_Data_D.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
@@ -143,7 +128,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
 
 process.baconSequence = cms.Sequence(
         process.egammaPostRecoSeq                  *
-        process.prefiringweight                    *
         process.ntupler
         )
 

@@ -3,16 +3,14 @@ import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = True                                        # flag for if process data
-do_hlt_filter = True                                        # flag to skip events that fail relevant triggers
+is_data_flag  = False                                       # flag for if process data
+do_hlt_filter = False                                       # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant triggers
 
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-if is_data_flag:
-    process.GlobalTag.globaltag = cms.string('94X_dataRun2_v10')
-else:
-    process.GlobalTag.globaltag = cms.string('94X_mcRun2_asymptotic_v3')
+if not is_data_flag:
+    process.GlobalTag.globaltag = cms.string('102X_upgrade2018_realistic_v18')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -29,17 +27,16 @@ process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 #   (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-        runEnergyCorrections=False,  # corrections by default are fine for 2016 legacy
-        runVID=True,                 # get Fall17V2 IDs, which "breaks" photons
-        era='2016-Legacy')  
+        runEnergyCorrections=True,  # preliminary 2018 electron energy corrections
+        runVID=True,                # get Fall17V2 IDs, which "breaks" photons
+        era='2018-Prompt')
 
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('/store/data/Run2016B/DoubleMuon/MINIAOD/17Jul2018_ver1-v1/50000/F0D053B3-588B-E811-A535-AC1F6B0F7B08.root')
-#       fileNames = cms.untracked.vstring('/store/data/Run2016B/DoubleEG/MINIAOD/17Jul2018_ver1-v1/00000/001CFE54-588A-E811-BAC7-0025905C53F2.root')
+        fileNames = cms.untracked.vstring('/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -63,7 +60,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Data.root'),
+        outputName          = cms.untracked.string('Trimmed_MC.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
@@ -80,9 +77,6 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 edmRhoForJetEnergy  = cms.untracked.string('fixedGridRhoFastjetAll'),
                 doFillMETFilters    = cms.untracked.bool(False),
                 doFillMET           = cms.untracked.bool(False),
-                ecalWeightName      = cms.untracked.InputTag('prefiringweight:NonPrefiringProb'),
-                ecalWeightUpName    = cms.untracked.InputTag('prefiringweight:NonPrefiringProbUp'),
-                ecalWeightDownName  = cms.untracked.InputTag('prefiringweight:NonPrefiringProbDown'),
                 ),
 
         GenInfo = cms.untracked.PSet(

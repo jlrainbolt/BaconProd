@@ -1,10 +1,10 @@
 BaconProd
 =========
 
-Branch for producing bacon ntuples of 2016 legacy (MiniAODv3) and 2017 (MiniAODv2) data and MC
+Branch for producing bacon ntuples of 2018 MiniAOD data (Periods A-C 17Sep2018 rereco, Period D prompt reco) and MC (Autumn18)
 
  * Runs on CMS LPC
- * Uses CMSSW_9_4_12
+ * Uses CMSSW_10_2_13
  * Depends on jlrainbolt/BaconAna 2016legacy branch
 
 
@@ -12,19 +12,19 @@ Recipe for setup and running:
 
 ```Shell
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc6_amd64_gcc630
-cmsrel CMSSW_9_4_12
-cd CMSSW_9_4_12/src
+export SCRAM_ARCH=slc6_amd64_gcc700
+cmsrel CMSSW_10_2_13
+cd CMSSW_10_2_13/src
 cmsenv
 git cms-init
 git clone -b 2016legacy git@github.com:jlrainbolt/BaconAna
-git clone -b 2016legacy git@github.com:jlrainbolt/BaconProd
-git cms-merge-topic lathomas:L1Prefiring_9_4_9
-git cms-merge-topic cms-egamma:EgammaID_949
-git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
+git clone -b 2018prompt git@github.com:jlrainbolt/BaconProd
+git cms-merge-topic cms-egamma:EgammaPostRecoTools
+git clone -b ScalesSmearing2018_Dev git@github.com:cms-egamma/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data
+git cms-merge-topic cms-egamma:EgammaPostRecoTools_dev
 scram b -j 12
 ```
 
 * to run, navigate to BaconProd/Ntupler/config
-    + Data: cmsRun trimmedBacon_Data_2016.py
-    + MC: cmsRun trimmedBacon_MC_2016.py
+    + Data: cmsRun trimmedBacon_Data.py
+    + MC: cmsRun trimmedBacon_MC.py

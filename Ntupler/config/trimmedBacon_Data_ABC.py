@@ -10,9 +10,7 @@ hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant t
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
-    process.GlobalTag.globaltag = cms.string('94X_dataRun2_v6')
-else:
-    process.GlobalTag.globaltag = cms.string('94X_mc2017_realistic_v14')
+    process.GlobalTag.globaltag = cms.string('102X_dataRun2_Sep2018ABC_v2')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -29,17 +27,16 @@ process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 #   (https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes)
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
-        runEnergyCorrections=True,  # fix bug in 2017 electron energy corrections
+        runEnergyCorrections=True,  # preliminary 2018 electron energy corrections
         runVID=True,                # get Fall17V2 IDs, which "breaks" photons
-        era='2017-Nov17ReReco')  
+        era='2018-Prompt')
 
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(15000) )
 process.source = cms.Source("PoolSource",
-#       fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/00000/98CAEE3F-6B37-E811-BC3F-801844DEF100.root')
-        fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleEG/MINIAOD/31Mar2018-v1/80000/FAC7DC8A-3737-E811-8BA7-6CC2173DC380.root')
+        fileNames = cms.untracked.vstring('/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/47C7D3D3-15FD-D64E-A40C-7EF02D34F3EB.root')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -63,7 +60,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Data_2017.root'),
+        outputName          = cms.untracked.string('Trimmed_Data_ABC.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
