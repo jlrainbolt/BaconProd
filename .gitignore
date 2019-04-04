@@ -13,7 +13,9 @@ __init__.py
 # Stuff
 *~
 *.log
-
+*.out
+docker_stderror
+*.tar.gz
 
 # crab working directories
 Ntupler/crab/*/

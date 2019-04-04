@@ -28,3 +28,11 @@ scram b -j 12
 * to run, navigate to BaconProd/Ntupler/config
     + Data: cmsRun trimmedBacon_Data_2016.py
     + MC: cmsRun trimmedBacon_MC_2016.py
+
+
+Recipe for submitting to Condor:
+
+```Shell
+tar --exclude=.git --exclude=crab --exclude=tmp -czvf source.tar.gz CMSSW_9_4_12
+mv source.tar.gz CMSSW_9_4_12/src/BaconProd/Ntupler/config/.
+```

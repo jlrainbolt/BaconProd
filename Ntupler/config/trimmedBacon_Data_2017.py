@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -13,6 +14,15 @@ if is_data_flag:
     process.GlobalTag.globaltag = cms.string('94X_dataRun2_v6')
 else:
     process.GlobalTag.globaltag = cms.string('94X_mc2017_realistic_v14')
+
+#--------------------------------------------------------------------------------
+# Default options
+#================================================================================
+options = vp.VarParsing ('analysis')
+options.maxEvents   = 15000
+options.inputFiles  = '/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/00000/98CAEE3F-6B37-E811-BC3F-801844DEF100.root'
+#options.inputFiles  = '/store/data/Run2017B/DoubleEG/MINIAOD/31Mar2018-v1/80000/FAC7DC8A-3737-E811-8BA7-6CC2173DC380.root'
+options.parseArguments()
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -37,11 +47,7 @@ setupEgammaPostRecoSeq(process,
 # Input settings
 #================================================================================
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(15000) )
-process.source = cms.Source("PoolSource",
-#       fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleMuon/MINIAOD/31Mar2018-v1/00000/98CAEE3F-6B37-E811-BC3F-801844DEF100.root')
-        fileNames = cms.untracked.vstring('/store/data/Run2017B/DoubleEG/MINIAOD/31Mar2018-v1/80000/FAC7DC8A-3737-E811-8BA7-6CC2173DC380.root')
-        )
-
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(options.inputFiles))
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
@@ -63,7 +69,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Data_2017.root'),
+        outputName          = cms.untracked.string('Output.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 

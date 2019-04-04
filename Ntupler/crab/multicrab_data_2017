@@ -74,10 +74,9 @@ def main():
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'trimmedBacon_Data_2017.py'
         config.JobType.outputFiles = ['Output.root']
-        config.JobType.maxJobRuntimeMin = 2750
 
         config.Data.splitting = 'FileBased'
-        config.Data.unitsPerJob = 5
+        config.Data.unitsPerJob = 1
 
         config.Data.inputDataset = None
         config.Data.inputDBS = 'global'
@@ -96,22 +95,21 @@ def main():
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
-                            '/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD',
-                            '/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD',
-                            '/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD',
-                            '/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD',
-                            '/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD',
+#                           '/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD',
+#                           '/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD',
+#                           '/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD',
+#                           '/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD',
+#                           '/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD',
 
-                            '/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD',
-                            '/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD',
-                            '/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD',
-                            '/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD',
-                            '/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD',
+#                           '/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD',
+#                           '/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD',
+#                           '/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD',
+#                           '/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD',
+#                           '/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD',
                         ]
 
         for inDS in inputDatasets:
-            config.General.requestName = inDS.split('/')[1] + '_' + inDS.split('/')[2] 
-            config.General.requestName.replace('-31Mar2018-v1', '')
+            config.General.requestName = (inDS.split('/')[1] + '_' + inDS.split('/')[2]).replace('-31Mar2018-v1', '')
             config.Data.inputDataset = inDS
             config.Data.outputDatasetTag = '%s' % (config.General.requestName)
             # Submit.

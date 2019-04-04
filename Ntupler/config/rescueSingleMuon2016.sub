@@ -1,0 +1,25 @@
+##
+##  Submit CRAB rescue jobs to Condor
+##
+
+executable  = execRescue.sh
+universe    = vanilla
+
+output      = $(dataset)_$(jobid).out
+error       = $(dataset)_$(jobid).err
+log         = $(dataset)_$(jobid).log
+
+should_transfer_files   = YES
+transfer_input_files    = source.tar.gz
+when_to_transfer_output = ON_EXIT
+
+arguments   = "$(config) $(path) $(jobid) $(infile)"
+
+
+config      = trimmedBacon_Data_2016.py
+dataset     = SingleMuon_Run2016B_ver2
+path        = /store/user/jrainbol/BaconProd/2016/SingleMuon/SingleMuon_Run2016B_ver2/190402_184131/0000
+
+jobid       = 345
+infile      = /store/data/Run2016B/SingleMuon/MINIAOD/17Jul2018_ver2-v1/40000/BEDA4B9A-9C8B-E811-8511-00259075D706.root
+queue
