@@ -715,7 +715,7 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
     //==============================
     evtInfo->triggerBits = triggerBits;
 
-
+/*
     //
     // l1 ecal prefiring weight
     //==============================
@@ -739,6 +739,7 @@ void FillerEventInfo::fill(TEventInfo *evtInfo,
         assert(hPrefWeightDown.isValid());
         evtInfo->ecalWeightDown = *hPrefWeightDown;
     }
+*/
 }
 
 void FillerEventInfo::computeTrackMET(const unsigned int ipv,

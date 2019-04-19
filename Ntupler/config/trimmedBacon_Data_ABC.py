@@ -34,9 +34,10 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(15000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/47C7D3D3-15FD-D64E-A40C-7EF02D34F3EB.root')
+#       fileNames = cms.untracked.vstring('/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/47C7D3D3-15FD-D64E-A40C-7EF02D34F3EB.root')
+        fileNames = cms.untracked.vstring('/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/120000/F320ADAA-319B-1E43-9EFC-DF0E0C743E77.root')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -44,7 +45,7 @@ process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMCo
 #--------------------------------------------------------------------------------
 # Reporting
 #================================================================================
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.options = cms.untracked.PSet(
         wantSummary = cms.untracked.bool(False),
         Rethrow     = cms.untracked.vstring('ProductNotFound'),
@@ -60,7 +61,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Data_ABC.root'),
+        outputName          = cms.untracked.string('Trimmed_Muon_ABC.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 

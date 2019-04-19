@@ -34,7 +34,7 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000) )
 process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring('/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root')
         )
@@ -77,6 +77,9 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
                 edmRhoForJetEnergy  = cms.untracked.string('fixedGridRhoFastjetAll'),
                 doFillMETFilters    = cms.untracked.bool(False),
                 doFillMET           = cms.untracked.bool(False),
+                ecalWeightName      = cms.untracked.InputTag('prefiringweight:NonPrefiringProb'),
+                ecalWeightUpName    = cms.untracked.InputTag('prefiringweight:NonPrefiringProbUp'),
+                ecalWeightDownName  = cms.untracked.InputTag('prefiringweight:NonPrefiringProbDown'),
                 ),
 
         GenInfo = cms.untracked.PSet(
@@ -124,7 +127,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         )
 
 process.baconSequence = cms.Sequence(
-        process.egammaPostRecoSeq                  *
+        process.egammaPostRecoSeq           *
         process.ntupler
         )
 

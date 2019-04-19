@@ -67,14 +67,14 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = '2016'
+        config.General.workArea = '2018'
         config.General.transferOutputs = True
         config.General.transferLogs = False
 
         config.JobType.pluginName = 'Analysis'
-        config.JobType.psetName = 'trimmedBacon_MC_2016.py'
+        config.JobType.psetName = 'trimmedBacon_Data_ABC.py'
         config.JobType.outputFiles = ['Output.root']
-        config.JobType.maxJobRuntimeMin = 2750
+#       config.JobType.maxJobRuntimeMin = 2750
 
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = 1
@@ -90,18 +90,27 @@ def main():
         config.Site.storageSite = 'T3_US_FNALLPC' # Choose your site. 
 
         config.section_("Debug")
+        config.Debug.extraJDL = ['+CMS_ALLOW_OVERFLOW=False']
         config.Debug.scheddName = 'crab3@vocms0198.cern.ch' # ASO fix
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
-                            '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/MINIAODSIM',
-                            '/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v2/MINIAODSIM',
-                            #FIXME
+                            '/DoubleMuon/Run2018A-17Sep2018-v2/MINIAOD',
+                            '/DoubleMuon/Run2018B-17Sep2018-v1/MINIAOD',
+                            '/DoubleMuon/Run2018C-17Sep2018-v1/MINIAOD',
+
+#                           '/SingleMuon/Run2018A-17Sep2018-v2/MINIAOD',
+#                           '/SingleMuon/Run2018B-17Sep2018-v1/MINIAOD',
+#                           '/SingleMuon/Run2018C-17Sep2018-v1/MINIAOD',
+
+#                           '/EGamma/Run2018A-17Sep2018-v2/MINIAOD',
+#                           '/EGamma/Run2018B-17Sep2018-v1/MINIAOD',
+#                           '/EGamma/Run2018C-17Sep2018-v1/MINIAOD',
                         ]
 
         for inDS in inputDatasets:
-            config.General.requestName = inDS.split('/')[1].split('_')[0]
+            config.General.requestName = (inDS.split('/')[1] + '_' + inDS.split('/')[2]).replace('-31Mar2018-v1', '')
             config.Data.inputDataset = inDS
             config.Data.outputDatasetTag = '%s' % (config.General.requestName)
             # Submit.

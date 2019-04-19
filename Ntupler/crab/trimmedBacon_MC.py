@@ -3,14 +3,14 @@ import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = True                                        # flag for if process data
-do_hlt_filter = True                                        # flag to skip events that fail relevant triggers
+is_data_flag  = False                                       # flag for if process data
+do_hlt_filter = False                                       # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_25ns"    # list of relevant triggers
 
 cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-if is_data_flag:
-    process.GlobalTag.globaltag = cms.string('102X_dataRun2_Prompt_v13')
+if not is_data_flag:
+    process.GlobalTag.globaltag = cms.string('102X_upgrade2018_realistic_v18')
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -34,10 +34,8 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 process.source = cms.Source("PoolSource",
-#       fileNames = cms.untracked.vstring('/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/057/00000/07C1E12E-FD5B-0B47-A700-DE5E56BD458A.root')
-        fileNames = cms.untracked.vstring('/store/data/Run2018D/SingleMuon/MINIAOD/PromptReco-v2/000/322/106/00000/506341FC-ADB2-E811-A8F8-FA163E472D18.root')
+        fileNames = cms.untracked.vstring('')
         )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -61,7 +59,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Muon_D.root'),
+        outputName          = cms.untracked.string('Output.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
@@ -128,7 +126,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         )
 
 process.baconSequence = cms.Sequence(
-        process.egammaPostRecoSeq                  *
+        process.egammaPostRecoSeq           *
         process.ntupler
         )
 
