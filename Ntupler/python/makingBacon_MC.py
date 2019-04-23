@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -26,6 +27,14 @@ process.load('BaconProd/Ntupler/PFBRECO_v2_cff')
 process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
 
 #--------------------------------------------------------------------------------
+# Default options
+#================================================================================
+options = vp.VarParsing ('analysis')
+options.maxEvents   = 1000
+options.inputFiles  = '/store/mc/Summer12_DR53X/ZZTo2e2mu_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/FC528D52-81EE-E111-9433-1CC1DE1CE56C.root'
+options.parseArguments()
+
+#--------------------------------------------------------------------------------
 # Import custom configurations
 #================================================================================
 
@@ -42,17 +51,11 @@ else:
   process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3")
 
 #--------------------------------------------------------------------------------
-# input settings
+# Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.source = cms.Source("PoolSource",
-  fileNames  = cms.untracked.vstring('file:/afs/cern.ch/work/k/ksung/private/HZZ4lAna/temp/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6_PU_S10_START53_V7A_FEEEEFFF-7FFB-E111-8FE2-002618943810.root')
-#  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/20000/00277FF2-7B84-E211-9475-782BCB27B958.root')
-#  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/0000/00065798-2704-E211-B308-0025901D4C44.root')
-#  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball/AODSIM/PU_S10_START53_V7C-v1/00000/001B91CE-7639-E211-B7D1-00261894385A.root')
-)
-process.source.inputCommands = cms.untracked.vstring("keep *",
-                                                     "drop *_MEtoEDMConverter_*_*")
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(options.inputFiles))
+process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
 # Reporting

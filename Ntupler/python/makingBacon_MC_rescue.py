@@ -1,11 +1,10 @@
 import FWCore.ParameterSet.Config as cms
-import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
 
-is_data_flag  = True                                     # flag for if process data
-do_hlt_filter = True                                     # flag to skip events that fail relevant triggers
+is_data_flag  = False                                    # flag for if process data
+do_hlt_filter = False                                    # flag to skip events that fail relevant triggers
 hlt_filename  = "BaconAna/DataFormats/data/HLTFile_v2"   # list of relevant triggers
 
 cmssw_base = os.environ['CMSSW_BASE']
@@ -21,19 +20,10 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load('Configuration/EventContent/EventContent_cff')
 process.load('TrackingTools/TransientTrack/TransientTrackBuilder_cfi')
 
-process.GlobalTag.globaltag = 'FT53_V21A_AN6::All'
+process.GlobalTag.globaltag = 'START53_V27::All'
 
 process.load('BaconProd/Ntupler/PFBRECO_v2_cff')
 process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
-
-#--------------------------------------------------------------------------------
-# Default options
-#================================================================================
-options = vp.VarParsing ('analysis')
-options.maxEvents   = 1000
-options.inputFiles  = '/store/data/Run2012A/DoubleMuParked/AOD/22Jan2013-v1/20000/FE9EFC2A-E7D3-E211-8903-485B39800C16.root'
-options.parseArguments()
-
 
 #--------------------------------------------------------------------------------
 # Import custom configurations
@@ -44,7 +34,7 @@ process.load('BaconProd/Ntupler/myJetExtras08CHS_cff')    # include gen jets and
 process.load('BaconProd/Ntupler/myJetExtras15CHS_cff')    # include gen jets and b-tagging
 
 process.load('BaconProd/Ntupler/myMETFilters_cff')        # apply MET filters set to tagging mode
-process.load('BaconProd/Ntupler/myMVAMetData_cff')        # MVA MET
+process.load('BaconProd/Ntupler/myMVAMet_cff')            # MVA MET
 process.load("BaconProd/Ntupler/myPFMETCorrections_cff")  # PF MET corrections
 if is_data_flag:
   process.pfJetMETcorr.jetCorrLabel = cms.string("ak5PFL1FastL2L3Residual")
@@ -54,9 +44,9 @@ else:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
-  fileNames  = cms.untracked.vstring('/store/data/Run2012A/DoubleMuParked/AOD/22Jan2013-v1/20000/FE9EFC2A-E7D3-E211-8903-485B39800C16.root')
+  fileNames  = cms.untracked.vstring('/store/mc/Summer12_DR53X/ZZTo4mu_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/12C91913-CBF3-E111-BD99-1CC1DE052068.root')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")
@@ -76,7 +66,7 @@ process.options = cms.untracked.PSet(
 #================================================================================
 process.ntupler = cms.EDAnalyzer('NtuplerMod',
   skipOnHLTFail = cms.untracked.bool(do_hlt_filter),
-  outputName    = cms.untracked.string('Output.root'),
+  outputName    = cms.untracked.string('Output_10.root'),
   TriggerFile   = cms.untracked.string(hlt_filename),
   edmPVName     = cms.untracked.string('offlinePrimaryVertices'),
   edmPFCandName = cms.untracked.string('particleFlow'),
@@ -90,7 +80,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
     edmPFMETCorrName     = cms.untracked.string('pfType1CorrectedMet'),
     edmMVAMETName        = cms.untracked.string('pfMEtMVA'),
     edmMVAMETUnityName   = cms.untracked.string('pfMEtMVAUnity'),
-    edmMVAMETNoSmearName = cms.untracked.string('pfMEtMVA'),
+    edmMVAMETNoSmearName = cms.untracked.string('pfMEtMVANoSmear'),
     edmRhoForIsoName     = cms.untracked.string('kt6PFJets'),
     edmRhoForJetEnergy   = cms.untracked.string('kt6PFJets'),
     doFillMET            = cms.untracked.bool(True),
@@ -354,9 +344,13 @@ process.baconSequence = cms.Sequence(process.PFBRECO*
                                      process.metFilters*
                                      process.producePFMETCorrections*
                                      process.recojetsequence*
+                                     process.genjetsequence*
                                      process.AK5jetsequence*
+                                     process.AK5genjetsequence*
                                      process.CA8jetsequenceCHS*
+                                     process.CA8genjetsequenceCHS*
                                      process.CA15jetsequenceCHS*
+                                     process.CA15genjetsequenceCHS*
                                      process.PFTau*   ### must come after antiktGenJets otherwise conflict on RecoJets/JetProducers/plugins
 				     process.MVAMetSeq*
 				     process.ntupler)

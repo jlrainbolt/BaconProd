@@ -1,0 +1,25 @@
+# C/C++
+*.o
+*.d
+*.so
+
+# Python
+__init__.py
+*.py[cod]
+
+# ROOT
+*.root
+
+# Stuff
+*~
+*.log
+*.out
+*.err
+docker_stderror
+*.tar.gz
+
+# crab working directories
+Ntupler/crab/*/
+
+# keep ROOT files in data directory
+!Utils/data/*.root

@@ -1,5 +1,4 @@
 import FWCore.ParameterSet.Config as cms
-import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -27,15 +26,6 @@ process.load('BaconProd/Ntupler/PFBRECO_v2_cff')
 process.load("RecoTauTag/Configuration/RecoPFTauTag_cff")
 
 #--------------------------------------------------------------------------------
-# Default options
-#================================================================================
-options = vp.VarParsing ('analysis')
-options.maxEvents   = 1000
-options.inputFiles  = '/store/data/Run2012A/DoubleMuParked/AOD/22Jan2013-v1/20000/FE9EFC2A-E7D3-E211-8903-485B39800C16.root'
-options.parseArguments()
-
-
-#--------------------------------------------------------------------------------
 # Import custom configurations
 #================================================================================
 
@@ -54,9 +44,8 @@ else:
 #--------------------------------------------------------------------------------
 # input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 process.source = cms.Source("PoolSource",
-  fileNames  = cms.untracked.vstring('/store/data/Run2012A/DoubleMuParked/AOD/22Jan2013-v1/20000/FE9EFC2A-E7D3-E211-8903-485B39800C16.root')
+        fileNames = cms.untracked.vstring('')
 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_MEtoEDMConverter_*_*")

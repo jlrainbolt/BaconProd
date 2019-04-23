@@ -1,0 +1,26 @@
+##
+##  Submit CRAB rescue jobs to Condor
+##
+
+executable  = execJob.sh
+universe    = vanilla
+
+output      = $(dataset)_$(Process).out
+error       = $(dataset)_$(Process).err
+log         = $(dataset)_$(Process).log
+
+should_transfer_files   = YES
+transfer_input_files    = source.tar.gz
+when_to_transfer_output = ON_EXIT
+
+arguments   = "$(config) $(path) $(Process) $(infile)"
+
+
+config      = makingBacon_MC.py
+
+
+
+dataset     = ZZTo4e
+path        = /store/user/jrainbol/BaconProd/04/ZZTo4e
+
+queue infile from [0:148:1] ZZTo4e.lst
