@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -11,6 +12,14 @@ cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if not is_data_flag:
     process.GlobalTag.globaltag = cms.string('102X_upgrade2018_realistic_v18')
+
+#--------------------------------------------------------------------------------
+# Default options
+#================================================================================
+options = vp.VarParsing ('analysis')
+options.maxEvents   = 15000
+options.inputFiles  = '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root')
+options.parseArguments()
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -34,11 +43,8 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000) )
-process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/FFDCFC59-4ABE-0646-AABE-BD5D65301169.root')
-        )
-
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(options.inputFiles))
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
@@ -60,7 +66,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_MC.root'),
+        outputName          = cms.untracked.string('Output.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 

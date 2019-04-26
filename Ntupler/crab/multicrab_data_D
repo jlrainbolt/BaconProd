@@ -96,11 +96,11 @@ def main():
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
-                            '/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD',
+#                           '/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD',
 
 #                           '/SingleMuon/Run2018D-PromptReco-v2/MINIAOD',
 
-#                           '/EGamma/Run2018D-PromptReco-v2/MINIAOD',
+                            '/EGamma/Run2018D-PromptReco-v2/MINIAOD',
                         ]
 
         for inDS in inputDatasets:

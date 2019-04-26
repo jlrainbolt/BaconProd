@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -11,6 +12,15 @@ cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
     process.GlobalTag.globaltag = cms.string('102X_dataRun2_Sep2018ABC_v2')
+
+#--------------------------------------------------------------------------------
+# Default options
+#================================================================================
+options = vp.VarParsing ('analysis')
+options.maxEvents   = 15000
+options.inputFiles  = '/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/47C7D3D3-15FD-D64E-A40C-7EF02D34F3EB.root'
+#options.inputFiles  = '/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/120000/F320ADAA-319B-1E43-9EFC-DF0E0C743E77.root'
+options.parseArguments()
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -34,12 +44,8 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
-process.source = cms.Source("PoolSource",
-#       fileNames = cms.untracked.vstring('/store/data/Run2018A/EGamma/MINIAOD/17Sep2018-v2/100000/47C7D3D3-15FD-D64E-A40C-7EF02D34F3EB.root')
-        fileNames = cms.untracked.vstring('/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/120000/F320ADAA-319B-1E43-9EFC-DF0E0C743E77.root')
-        )
-
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(options.inputFiles))
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
@@ -61,7 +67,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Muon_ABC.root'),
+        outputName          = cms.untracked.string('Output.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 

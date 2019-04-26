@@ -1,0 +1,39 @@
+##
+##  Submit CRAB rescue jobs to Condor
+##
+
+executable  = execRescue.sh
+universe    = vanilla
+
+output      = $(dataset)_$(jobid)_$(skip).out
+error       = $(dataset)_$(jobid)_$(skip).err
+log         = $(dataset)_$(jobid)_$(skip).log
+
+should_transfer_files   = YES
+transfer_input_files    = source.tar.gz
+when_to_transfer_output = ON_EXIT
+
+arguments   = "$(config) $(path) $(jobid) $(skip) $(events) $(infile)"
+
+
+config      = trimmedBacon_Data_D.py
+
+
+
+dataset     = EGamma_Run2018D-PromptReco-v2
+path        = /store/user/jrainbol/BaconProd/2018/EGamma/EGamma_Run2018D-PromptReco-v2/190422_171032/0000
+
+    jobid   = 2
+    infile  = /store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/500/00000/003D3EB6-F895-E811-86FC-FA163E52F8C2.root
+
+#       skip    = 0
+#       events  = 2000
+#       queue
+
+        skip    = 2000
+        events  = 1000
+        queue
+
+        skip    = 3000
+        events  = -1
+        queue

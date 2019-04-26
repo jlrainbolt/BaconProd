@@ -13,6 +13,7 @@ __init__.py
 # Stuff
 *~
 *.log
+*.tar.gz
 
 
 # crab working directories

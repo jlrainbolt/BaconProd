@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as vp
 import os
 
 process = cms.Process('MakingBacon')
@@ -11,6 +12,22 @@ cmssw_base = os.environ['CMSSW_BASE']
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 if is_data_flag:
     process.GlobalTag.globaltag = cms.string('102X_dataRun2_Prompt_v13')
+
+#--------------------------------------------------------------------------------
+# Default options
+#================================================================================
+options = vp.VarParsing ('analysis')
+options.register (  'skipEvents',
+                    0,
+                    options.multiplicity.singleton,
+                    options.varType.int,
+                    "Number of events to skip (0 by default)"
+                    )
+options.skipEvents  = 0
+options.maxEvents   = 15000
+options.inputFiles  = '/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/057/00000/07C1E12E-FD5B-0B47-A700-DE5E56BD458A.root'
+#options.inputFiles  = '/store/data/Run2018D/SingleMuon/MINIAOD/PromptReco-v2/000/322/106/00000/506341FC-ADB2-E811-A8F8-FA163E472D18.root'
+options.parseArguments()
 
 #--------------------------------------------------------------------------------
 # Import of standard configurations
@@ -34,12 +51,11 @@ setupEgammaPostRecoSeq(process,
 #--------------------------------------------------------------------------------
 # Input settings
 #================================================================================
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 process.source = cms.Source("PoolSource",
-#       fileNames = cms.untracked.vstring('/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/057/00000/07C1E12E-FD5B-0B47-A700-DE5E56BD458A.root')
-        fileNames = cms.untracked.vstring('/store/data/Run2018D/SingleMuon/MINIAOD/PromptReco-v2/000/322/106/00000/506341FC-ADB2-E811-A8F8-FA163E472D18.root')
-        )
-
+                            fileNames = cms.untracked.vstring(options.inputFiles),
+                            skipEvents = cms.untracked.uint32(options.skipEvents)
+                            )
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
 
 #--------------------------------------------------------------------------------
@@ -61,7 +77,7 @@ process.ntupler = cms.EDAnalyzer('NtuplerMod',
         TriggerObject       = cms.untracked.string("slimmedPatTrigger"),
         TriggerFile         = cms.untracked.string(hlt_filename),
         useAOD              = cms.untracked.bool(False),
-        outputName          = cms.untracked.string('Trimmed_Muon_D.root'),
+        outputName          = cms.untracked.string('Output.root'),
         edmPVName           = cms.untracked.string('offlineSlimmedPrimaryVertices'),
         edmGenRunInfoName   = cms.untracked.string('generator'),
 
